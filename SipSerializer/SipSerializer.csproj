@@ -1,0 +1,10 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <RootNamespace>Javor.SipSerializer</RootNamespace>
+    <AssemblyName>Javor.SipSerializer</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SdpSerializer\SdpSerializer.csproj" />
+  </ItemGroup>
+</Project>

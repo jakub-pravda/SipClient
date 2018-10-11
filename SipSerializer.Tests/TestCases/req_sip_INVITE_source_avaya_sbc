@@ -1,0 +1,37 @@
+﻿INVITE sip:80362@algocloud.net SIP/2.0
+FROM: "Test JPR" <sip:+420225006110@algocloud.net>;tag=80eea88d4a11e71dda58b0b03400
+To: <sip:80362@algocloud.net>
+CSeq: 1 INVITE
+Call-ID: 9255ba2465765c49339cde4c46086852
+Contact: "Test JPR" <sip:+420225006110@91.241.11.242:5060;transport=udp;gsid=80eea88d-4a11-4701-8bda-58b0b0340000>
+Allow: INVITE, ACK, OPTIONS, BYE, CANCEL, SUBSCRIBE, NOTIFY, REFER, INFO, PRACK, PUBLISH, UPDATE
+Supported: 100rel, histinfo, join, replaces, timer
+Max-Forwards: 66
+Via: SIP/2.0/UDP 91.241.11.242:5060;branch=z9hG4bK-s1632-001300246567-1--s1632-
+Accept-Language: en
+Alert-Info: <cid:internal@algocloud.net>;avaya-cm-alert-type=internal
+P-Asserted-Identity: "Test JPR" <sip:+420225006110@algocloud.net>
+Session-Expires: 1800;refresher=uac
+Min-SE: 1800
+Remote-LegId: 462
+Content-Type: application/sdp
+User-to-User: 00FA080001008858BFD6BD;encoding=hex
+P-AV-Message-Id: 1_1
+Max-Breadth: 60
+P-Charging-Vector: icid-value="AAS:50-8da8ee801e7114ab058da0c34b0"
+Content-Length: 258
+
+v=0
+o=- 1488967357 1 IN IP4 91.241.11.242
+s=-
+c=IN IP4 91.241.11.242
+b=AS:64
+t=0 0
+a=avf:avc=n prio=n
+a=csup:avf-v0
+m=audio 35430 RTP/AVP 8 0 120
+a=sendrecv
+a=rtpmap:8 PCMA/8000
+a=rtpmap:0 PCMU/8000
+a=rtpmap:120 telephone-event/8000
+a=ptime:20
