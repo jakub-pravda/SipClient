@@ -1,4 +1,5 @@
-﻿using Javor.SipSerializer.Models;
+﻿using Javor.SipSerializer.Extensions;
+using Javor.SipSerializer.Models;
 using System;
 
 namespace Javor.SipSerializer.Helpers
@@ -26,21 +27,22 @@ namespace Javor.SipSerializer.Helpers
             return sipRequest;
         }
 
-        public static SipRequestMessage CreateSipRegister(SipRegisterOptions sipRegisterMandatoryFields)
+        public static SipRequestMessage CreateSipRegister(SipRegisterOptions sipRegisterOptions)
         {
+            if (!sipRegisterOptions.IsValid())
+                throw new MissingFieldException("Model validation failed.");
+
             // create REGISTER message
             SipRequestMessage register = new SipRequestMessage(
                 RequestMethods.Register,
-                sipRegisterMandatoryFields.RequestUri,
-                sipRegisterMandatoryFields.SequenceNumber);
+                sipRegisterOptions.RequestUri,
+                sipRegisterOptions.SequenceNumber);
 
             // fill REGISTER mandatory fields
-            register.Headers.To = sipRegisterMandatoryFields.To;
-            register.Headers.From = sipRegisterMandatoryFields.From;
-            register.Headers.CallId = sipRegisterMandatoryFields.CallId;
-            register.Headers.Contact = sipRegisterMandatoryFields.Contact;
-
-            // TODO check register message validity or register options validity
+            register.Headers.To = sipRegisterOptions.To;
+            register.Headers.From = sipRegisterOptions.From;
+            register.Headers.CallId = sipRegisterOptions.CallId;
+            register.Headers.Contact = sipRegisterOptions.Contact;
 
             return register;
         }

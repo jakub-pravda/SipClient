@@ -17,7 +17,7 @@ namespace Javor.SipSerializer.Extensions
         /// </summary>
         /// <param name="toValidate">Model which should be validated.</param>
         /// <returns>True if model has all required fields. False otherwise.</returns>
-        public static bool Validate(this object toValidate)
+        public static bool IsValid(this object toValidate)
         {
             if (toValidate == null) throw new ArgumentNullException("Model for validation cann't be null.");
 
