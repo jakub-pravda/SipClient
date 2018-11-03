@@ -171,6 +171,7 @@ namespace Javor.SipSerializer
         {
             StringBuilder sb = new StringBuilder();
             sb.Append(Headers.ToString());
+            sb.Append(ABNF.CRLF);
 
             return sb.ToString();
         }
