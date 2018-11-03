@@ -4,6 +4,7 @@ using Javor.SipSerializer.HeaderFields;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Text;
 
 namespace Javor.SipSerializer
 {
@@ -12,6 +13,11 @@ namespace Javor.SipSerializer
     /// </summary>
     public class SipRequestMessage : SipMessage
     {
+        /// <summary>
+        ///     Request line.
+        /// </summary>
+        public RequestLine RequestLine { get; }
+
         private SipRequestMessage()
         {
             Type = SipMessageType.Request;
@@ -31,10 +37,18 @@ namespace Javor.SipSerializer
         {
             RequestLine = requestLine;
         }
-        
+
         /// <summary>
-        ///     Request line.
+        ///     Convert SIP request message into the string.
         /// </summary>
-        public RequestLine RequestLine { get; }
+        /// <returns></returns>
+        public override string ToString()
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine(RequestLine.ToString());
+            sb.Append(base.ToString());
+
+            return sb.ToString();
+        }
     }
 }

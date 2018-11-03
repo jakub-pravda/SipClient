@@ -62,9 +62,12 @@ namespace Javor.SipSerializer.Tests
 
         [Theory]
         [InlineData("INVITE sip:80362@algocloud.net SIP/2.0")]
-        public void Parse_RequestLine_Success(string requestLineString)
+        public void RequestLine_Deserialization_Serialization_Success(string requestLineString)
         {
-            Assert.NotNull(new RequestLine(requestLineString));
+            RequestLine deserialization = new RequestLine(requestLineString);
+            string serialization = deserialization.ToString();
+
+            Assert.Equal(requestLineString, serialization);
         }
 
         [Theory]

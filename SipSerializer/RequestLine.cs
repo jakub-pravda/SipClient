@@ -72,6 +72,15 @@ namespace Javor.SipSerializer
             Method = parsed[0];
             Uri = new Uri(parsed[1]);
         }
+
+        /// <summary>
+        ///     Convert Sip request into the ASCII format.
+        /// </summary>
+        /// <returns></returns>
+        public override string ToString()
+        {
+            return $"{Method} {Uri.AbsoluteUri} {Version}";
+        }
     }
 
 }
