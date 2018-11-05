@@ -1,4 +1,5 @@
 ﻿using Javor.SipSerializer.Attributes;
+using Javor.SipSerializer.Extensions;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
@@ -53,7 +54,6 @@ namespace Javor.SipSerializer.HeaderFields
         private ICollection<Via> _via;
         
         [HeaderName(HeaderFieldsNames.Cseq)]
-        //public CSeq Cseq { get; set; }
         public CSeq CSeq { get; set; }
 
         [HeaderName(HeaderFieldsNames.Contact, HeaderFieldsNames.ContactCompactForm)]
@@ -94,36 +94,20 @@ namespace Javor.SipSerializer.HeaderFields
                     HeaderNameAttribute headerName =
                         (HeaderNameAttribute)property.GetCustomAttribute(typeof(HeaderNameAttribute));
 
-                    // TODO I dont like this implementation :(
-                    if (value.GetType() == typeof(string))
-                    {
-                        // deal with classic strings
-                        sb.Append(headerName.GetHeaderFullName());
-                        sb.Append(':'); // TODO to ABRNF?
-                        sb.Append(value);
-                        sb.AppendLine();
-                    }
-                    else if (typeof(IEnumerable).IsAssignableFrom(property.PropertyType))
+                    if (property.PropertyType != typeof(string) && typeof(IEnumerable).IsAssignableFrom(property.PropertyType))
                     {
                         // deal with other enums (string inherits from enum, for that reason is 
                         //  string type control first and other enum type control 
                         //  (which using foreach loop) second)
                         foreach (var item in (IEnumerable)value)
                         {
-                            sb.Append(headerName.GetHeaderFullName());
-                            sb.Append(':'); // TODO to ABRNF?
-                            sb.Append(item.ToString());
-                            sb.AppendLine();
+                            sb.AppendSipLine(headerName.GetHeaderFullName(), item.ToString());
                         }
                     }
-                    else if (value.GetType() == typeof(int))
+                    else
                     {
-                        string converted = value.ToString(); // TODO optimalizace!!!! zbytecne opakuju kod
-
-                        sb.Append(headerName.GetHeaderFullName());
-                        sb.Append(':'); // TODO to ABRNF?
-                        sb.Append(value);
-                        sb.AppendLine();
+                        // deal with other data types
+                        sb.AppendSipLine(headerName.GetHeaderFullName(), value.ToString());
                     }
                 }
             }

@@ -24,5 +24,14 @@ namespace Javor.SipSerializer.HeaderFields
             SequenceNumber = sequenceNumber;
             Method = method;
         }
+
+        /// <summary>
+        ///     Convert CSeq into the ascii form.
+        /// </summary>
+        /// <returns></returns>
+        public override string ToString()
+        {
+            return $"{SequenceNumber} {Method}";
+        }
     }
 }
