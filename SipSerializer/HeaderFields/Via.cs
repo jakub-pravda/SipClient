@@ -1,5 +1,6 @@
 using System;
 using System.Net;
+using System.Text;
 
 namespace Javor.SipSerializer.HeaderFields
 {
@@ -19,30 +20,72 @@ namespace Javor.SipSerializer.HeaderFields
         /// <summary>
         ///     Initialize new Via header.
         /// </summary>
-        /// <param name="viaHeader">Via header content.</param>
+        /// <param name="viaHeader">Full via header in the ascii form.</param>
         public Via(string viaHeader)
             : base(viaHeader)
         {
         }
 
-        public string Version { get; set; }
-        public Guid Branch { get; set; }
-        public TransportProtocol TransportProtocol { get; set; }
-        public IPAddress IPAddress { get; set; }
-        public UInt16 Port { get; set; }
+        /// <summary>
+        ///     Initialize new Via header.
+        /// </summary>
+        /// <param name="ipAddress">Host ip address.</param>
+        /// <param name="port">Host port.</param>
+        /// <param name="transportProtocol">Communication protocol used by host.</param>
+        /// <param name="branch">Branch parameter.</param>
+        public Via(string ipAddress, int port, TransportProtocol transportProtocol, string branch = null)
+        {
+            IpAddress = ipAddress;
+            Port = port;
+            TransportProtocol = transportProtocol;
+            Branch = branch;
+        }
+        
+        /// <summary>
+        ///     Sip version.
+        /// </summary>
+        public string Version { get; set; } = Constants.SipVersion;
 
         /// <summary>
-        ///     Convert Via header into the string.
+        ///     Branch parameter.
+        /// </summary>
+        public string Branch { get; set; }
+
+        /// <summary>
+        ///     Transport protocol using by sip sip server/client which issued via header.
+        /// </summary>
+        public TransportProtocol TransportProtocol { get; set; }
+
+        /// <summary>
+        ///     Ip address or hostname of SIP server/client.
+        /// </summary>
+        public string IpAddress { get; set; }
+
+        /// <summary>
+        ///     Port which will be used by endpoint to communicate with localhost.
+        /// </summary>
+        public int Port { get; set; }
+        
+        /// <summary>
+        ///     Set new unique branch parameter. The original branch parameter is rewritten. 
+        /// </summary>
+        public void SetNewBranchParameter()
+        {
+            Branch = string.Format("z9hG4bK{0}", Guid.NewGuid().ToString("N"));
+        }
+
+        /// <summary>
+        ///     Convert Via header to the ascii form.
         /// </summary>
         /// <returns></returns>
         public override string ToString()
         {
-            if (!String.IsNullOrEmpty(OriginalString))
+            if (!string.IsNullOrEmpty(OriginalString))
             {
                 return OriginalString;
             }
 
-            throw new NotImplementedException("Via string conversion not yet implemented.");
+            return $"{Version}/{TransportProtocol.ToString()} {IpAddress}:{Port.ToString()};branch={Branch}";
         }
     }
 }

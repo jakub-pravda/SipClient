@@ -31,27 +31,8 @@ namespace Javor.SipSerializer.HeaderFields
         public string MaxForwards { get; set; }
 
         [HeaderName(HeaderFieldsNames.Via)]
-        public ICollection<Via> Via {
-            get
-            {
-                return _via;
-            }
-            set
-            {
-                if (_via == null)
-                {
-                    _via = value;
-                }
-                else
-                {
-                    foreach (Via via in value)
-                    {
-                        _via.Add(via);
-                    }
-                }
-            }
-        }
-        private ICollection<Via> _via;
+        public ICollection<Via> Via { get; set; }
+            = new List<Via>();
         
         [HeaderName(HeaderFieldsNames.Cseq)]
         public CSeq CSeq { get; set; }
@@ -75,7 +56,7 @@ namespace Javor.SipSerializer.HeaderFields
         public int ContentLength { get; set; }
 
         //public IEnumerable<string> UnknownHeaders { get; set; }
-
+        
         /// <summary>
         ///     Convert SIP headers into the string.
         /// </summary>

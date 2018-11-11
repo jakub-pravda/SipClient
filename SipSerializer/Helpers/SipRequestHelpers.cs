@@ -1,4 +1,5 @@
 ﻿using Javor.SipSerializer.Extensions;
+using Javor.SipSerializer.HeaderFields;
 using Javor.SipSerializer.Models;
 using System;
 
@@ -27,7 +28,13 @@ namespace Javor.SipSerializer.Helpers
             return sipRequest;
         }
 
-        public static SipRequestMessage CreateSipRegister(SipRegisterOptions sipRegisterOptions)
+        /// <summary>
+        ///     Create REGISTER request.
+        /// </summary>
+        /// <param name="sipRegisterOptions">REGISTER request options.</param>
+        /// <param name="viaHeader">Server/client host information packaged in via header.</param>
+        /// <returns>REGISTER request.</returns>
+        public static SipRequestMessage CreateSipRegister(SipRegisterOptions sipRegisterOptions, Via viaHeader = null)
         {
             if (!sipRegisterOptions.IsValid())
                 throw new MissingFieldException("Model validation failed.");
@@ -43,6 +50,11 @@ namespace Javor.SipSerializer.Helpers
             register.Headers.From = sipRegisterOptions.From;
             register.Headers.CallId = sipRegisterOptions.CallId;
             register.Headers.Contact = sipRegisterOptions.Contact;
+
+            if (viaHeader != null)
+            {
+                register.Headers.Via.Add(viaHeader);
+            }
 
             return register;
         }

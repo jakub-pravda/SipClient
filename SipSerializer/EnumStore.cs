@@ -9,7 +9,7 @@ namespace Javor.SipSerializer
         sips
     }
     /// <summary>
-    ///     List of meaningful transport protocols
+    ///     List of meaningful SIP transport protocols
     /// </summary>
     public enum TransportProtocol
     {
