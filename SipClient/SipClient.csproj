@@ -2,9 +2,18 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <RootNamespace>Javor.SipClient</RootNamespace>
+    <RootNamespace>SipClient</RootNamespace>
     <AssemblyName>Javor.SipClient</AssemblyName>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="LibLog" Version="5.0.2">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.CSharp" Version="4.5.0" />
+  </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\SipSerializer\SipSerializer.csproj" />
   </ItemGroup>

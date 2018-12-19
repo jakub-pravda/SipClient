@@ -1,3 +1,5 @@
+using Javor.SipSerializer;
+using Javor.SipSerializer.Schemes;
 using System;
 using System.Net;
 
@@ -5,30 +7,37 @@ namespace SipClient.Models
 {
     public class SipClientAccount
     {
+        // **** USER INFORMATION ****
+
         public string Name { get; set; }
-        public Uri Registrar { get; set; }
         public string User { get; set; }
         public string AuthenticationUser { get; set; }
         public string Password { get; set; } // TODO dont save password purely in string
-        public int Timeout { get; set; } = 3600;
+
+        // **** CONNECTION INFORMATION ****
+        public SipUri RegistrarUri { get; set; }
+
+        public TransportProtocol TransportProtocol { get; set; }
+
+
 
         public SipClientAccount()
         {
             
         }
 
-        public SipClientAccount(string username, string password, Uri registrar)
+        public SipClientAccount(string username, string password, string registrarUri)
         {
             if (string.IsNullOrEmpty(username))
                 throw new ArgumentNullException("Username must be valid username."); // TODO username check?
-            if (registrar == null)
+            if (registrarUri == null)
                 throw new ArgumentNullException("Invalid registrar uri.");
 
             Name = username;
             User = username;
             AuthenticationUser = username;
             Password = password;
-            Registrar = registrar;
+            //RegistrarUri = registrarUri;
         }
     }
 }

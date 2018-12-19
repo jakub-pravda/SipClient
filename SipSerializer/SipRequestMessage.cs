@@ -23,13 +23,16 @@ namespace Javor.SipSerializer
             Type = SipMessageType.Request;
         }
 
-        public SipRequestMessage(string requestType, Uri uri, int sequenceNumber)
+        public SipRequestMessage(string requestType, Uri uri)
             : this()
         {
             RequestLine = new RequestLine(requestType, uri);
+        }
 
-            // define headers
-            Headers.CSeq = new CSeq(sequenceNumber, requestType);
+        public SipRequestMessage(string requestType, string uri)
+            : this()
+        {
+            RequestLine = new RequestLine(requestType, uri);
         }
 
         public SipRequestMessage(RequestLine requestLine)

@@ -35,10 +35,21 @@ namespace Javor.SipSerializer.HeaderFields
         /// <param name="branch">Branch parameter.</param>
         public Via(string ipAddress, int port, TransportProtocol transportProtocol, string branch = null)
         {
+            // TODO branch check + guardian clausses
+
             IpAddress = ipAddress;
             Port = port;
             TransportProtocol = transportProtocol;
-            Branch = branch;
+
+            if (string.IsNullOrEmpty(branch))
+            {
+                SetNewBranchParameter();
+            }
+            else
+            {
+                // branch check
+                Branch = branch;
+            }
         }
         
         /// <summary>
@@ -65,15 +76,7 @@ namespace Javor.SipSerializer.HeaderFields
         ///     Port which will be used by endpoint to communicate with localhost.
         /// </summary>
         public int Port { get; set; }
-        
-        /// <summary>
-        ///     Set new unique branch parameter. The original branch parameter is rewritten. 
-        /// </summary>
-        public void SetNewBranchParameter()
-        {
-            Branch = string.Format("z9hG4bK{0}", Guid.NewGuid().ToString("N"));
-        }
-
+       
         /// <summary>
         ///     Convert Via header to the ascii form.
         /// </summary>
@@ -87,5 +90,12 @@ namespace Javor.SipSerializer.HeaderFields
 
             return $"{Version}/{TransportProtocol.ToString()} {IpAddress}:{Port.ToString()};branch={Branch}";
         }
+
+
+        private void SetNewBranchParameter()
+        {
+            Branch = string.Format("z9hG4bK{0}", Guid.NewGuid().ToString("N"));
+        }
+
     }
 }

@@ -56,7 +56,7 @@ namespace Javor.SipSerializer
         {
             var parsed = statusLine.Trim().Split(ABNF.SP);
 
-            if (!SipParsingHelpers.IsStatusLine(parsed, out string err))
+            if (!ParsingHelpers.IsStatusLine(parsed, out string err))
             {
                 throw new SipParsingException(err);
             }

@@ -30,7 +30,7 @@ namespace Javor.SipSerializer.HeaderFields
             
         }
         
-        public URI URI { get; set; }
+        public SipUri URI { get; set; }
         public string DisplayName { get; set; }
 
         [ParameterName("expires")]

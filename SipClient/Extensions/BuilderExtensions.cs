@@ -1,5 +1,6 @@
 using System;
 using System.Net;
+using Javor.SipSerializer.Schemes;
 using SipClient.Models;
 
 namespace SipClient.Extensions
@@ -18,19 +19,49 @@ namespace SipClient.Extensions
             return builder;
         }
 
-        public static ISipBuilder SetRegistrarUri(this ISipBuilder builder, Uri registrarUri)
+        public static ISipBuilder SetRegistrarUri(this ISipBuilder builder, SipUri registrarUri)
         {
             builder.RegistrarUri = registrarUri;
             return builder;
         }
 
-        public static ISipClient BuildSipClient(this ISipBuilder builder)
+        public static ISipBuilder SetRegistrarUri(this ISipBuilder builder, byte[] registrarIpAddress)
         {
+            builder.RegistrarUri = new SipUri(new IPAddress(registrarIpAddress).ToString());
+            return builder;
+        }
 
-            DefaultSipClient toReturn = new DefaultSipClient(builder.ClientAccount);
+        public static ISipBuilder SetRegistrarPort(this ISipBuilder builder, int registrarPort)
+        {
+            if (builder.RegistrarUri == null) throw new ArgumentNullException("Registrar sip uri must be defined before registrar port setting.");
 
+            builder.RegistrarUri.Port = registrarPort;
+            return builder;
+        }
+
+        public static ISipBuilder SetClientUri(this ISipBuilder builder, byte[] clientIpAddress, int port)
+        {
+            builder.ClientUri = new SipUri(new IPAddress(clientIpAddress).ToString(), port);
+            return builder;
+        }
+
+        public static ISipClient UseDefaultSipClient(this ISipBuilder builder)
+        {
+            SipClientAccount account = new SipClientAccount()
+            {
+                RegistrarUri = builder.RegistrarUri
+            };
+
+            return new DefaultSipClient(IPAddress.Parse(builder.ClientUri.Host), builder.ClientUri.Port, account);
+
+            // TODO this method should create sip builder and save it to some temp variable... sip client definition should be handled by some final builder method
+        }
+
+        public static ISipClient UseSipClient<T>(this ISipBuilder builder)
+            where T : ISipClient
+        {
             // TODO create builder
-            return null;
+            throw new NotImplementedException();
         }
     }
 }
