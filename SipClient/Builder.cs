@@ -10,6 +10,8 @@ namespace SipClient
     /// </summary>
     public interface ISipBuilder
     {
+        string User { get; set; }
+
         IEnumerable<string> AllowedMethods { get; set; }
 
         SipUri RegistrarUri { get; set; }
@@ -21,6 +23,8 @@ namespace SipClient
     /// </summary>
     public class SipBuilder : ISipBuilder
     {
+        public string User { get; set; }
+
         public IEnumerable<string> AllowedMethods { get; set; }
 
         public SipUri RegistrarUri { get; set; }

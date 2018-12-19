@@ -46,7 +46,7 @@ namespace SipClient.Models
         public void AddNewDestinationUri(SipUri destinationUri)
         {
             if (destinationUri == null) throw new ArgumentNullException("Invalid destination URI.");
-
+            
             DestinationURIs.Add(Guid.NewGuid(), destinationUri);
         }
 
@@ -62,8 +62,7 @@ namespace SipClient.Models
         {
             lock (_locker)
             {
-                _lastSeqNumber++;
-                return _lastSeqNumber;
+                return _lastSeqNumber++;
             }
         }
     }

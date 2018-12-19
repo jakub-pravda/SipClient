@@ -23,7 +23,6 @@ namespace Javor.SipSerializer.HeaderFields
         public string To { get; set; }
         
         [HeaderName(HeaderFieldsNames.CallId)]
-        //public Guid CallId { get; set; }    // TODO call id muze vypadat nasledovne, callid@host, umoznit uzivateli zadat host
         public string CallId { get; set; }
         
         [HeaderName(HeaderFieldsNames.MaxForwards)]

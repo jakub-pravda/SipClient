@@ -18,12 +18,14 @@ namespace Javor.SipSerializer.Schemes
         ///     Initialize new sip uri.
         /// </summary>
         /// <param name="host"></param>
-        public SipUri(string host)
+        public SipUri(string host, string user)
             : this()
         {
-            if (host == null) throw new ArgumentNullException("Invalid sip host.");
+            if (host == null) throw new ArgumentNullException("Invalid sip uri host.");
+            if (string.IsNullOrEmpty(user)) throw new ArgumentNullException("Invalid sip uri user.");
 
             Host = host;
+            User = user;
         }
 
         /// <summary>
@@ -31,8 +33,8 @@ namespace Javor.SipSerializer.Schemes
         /// </summary>
         /// <param name="host"></param>
         /// <param name="port"></param>
-        public SipUri(string host, int port)
-            : this(host)
+        public SipUri(string host, int port, string user)
+            : this(host, user)
         {
             Port = port;
         }

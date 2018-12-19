@@ -3,7 +3,7 @@ namespace Javor.SipSerializer.HeaderFields
     /// <summary>
     ///     CSeq header field
     /// </summary>
-    public struct CSeq
+    public class CSeq
     {
         /// <summary>
         ///     CSeq method.

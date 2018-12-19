@@ -66,13 +66,11 @@ namespace SipClient.Instances
         {
             if (request == null) throw new ArgumentNullException("Request message cann't be null.");
 
-            byte[] data = Encoding.ASCII.GetBytes(request.ToString());
 
             SetNewTransaction(request);
 
             _logger.Debug(string.Format("Sending SIP message {0} to {1}", request.ToString(), SipUri.ToString()));
-
-            bool sendResult = await SendData(data, SipUri.Host, SipUri.Port); // only ip address is valid at this time
+            bool sendResult = await SendData(Encoding.ASCII.GetBytes(request.ToString()), SipUri.Host, SipUri.Port); // only ip address is valid at this time
 
             return sendResult;
         }

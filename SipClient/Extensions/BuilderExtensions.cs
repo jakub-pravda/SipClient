@@ -7,6 +7,12 @@ namespace SipClient.Extensions
 {
     public static class BuilderExtensions
     {
+        public static ISipBuilder SetUser(this ISipBuilder builder, string user)
+        {
+            builder.User = user;
+            return builder;
+        }
+
         public static ISipBuilder SetAllowedMethods(this ISipBuilder builder, params string[] allowedMethods)
         {
             builder.AllowedMethods = allowedMethods;
@@ -27,7 +33,7 @@ namespace SipClient.Extensions
 
         public static ISipBuilder SetRegistrarUri(this ISipBuilder builder, byte[] registrarIpAddress)
         {
-            builder.RegistrarUri = new SipUri(new IPAddress(registrarIpAddress).ToString());
+            builder.RegistrarUri = new SipUri(new IPAddress(registrarIpAddress).ToString(), builder.User);
             return builder;
         }
 
@@ -41,7 +47,7 @@ namespace SipClient.Extensions
 
         public static ISipBuilder SetClientUri(this ISipBuilder builder, byte[] clientIpAddress, int port)
         {
-            builder.ClientUri = new SipUri(new IPAddress(clientIpAddress).ToString(), port);
+            builder.ClientUri = new SipUri(new IPAddress(clientIpAddress).ToString(), port, builder.User);
             return builder;
         }
 
@@ -49,7 +55,8 @@ namespace SipClient.Extensions
         {
             SipClientAccount account = new SipClientAccount()
             {
-                RegistrarUri = builder.RegistrarUri
+                RegistrarUri = builder.RegistrarUri,
+                User = builder.User
             };
 
             return new DefaultSipClient(IPAddress.Parse(builder.ClientUri.Host), builder.ClientUri.Port, account);
