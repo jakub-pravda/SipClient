@@ -48,7 +48,7 @@ namespace SipClient
 
         public SipDialogue GetNewDialogue()
         {
-            SipDialogue sd = new SipDialogue(Guid.NewGuid(), TransactionLayer, Account.RegistrarUri);
+            SipDialogue sd = new SipDialogue(Guid.NewGuid().ToString(), TransactionLayer, Account.RegistrarUri);
             return sd;
         }
 

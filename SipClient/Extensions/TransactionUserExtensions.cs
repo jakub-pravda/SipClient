@@ -1,10 +1,7 @@
-using System;
-using SipClient.Models;
 using Javor.SipSerializer;
 using Javor.SipSerializer.HeaderFields;
-using SipClient.Instances;
-using Javor.SipSerializer.Schemes;
-using System.Collections.Generic;
+using SipClient.Models;
+using System;
 using System.Threading.Tasks;
 
 namespace SipClient.Extensions
@@ -16,10 +13,9 @@ namespace SipClient.Extensions
     {
         public static async Task RegisterAsync(this ISipClient sipClient)
         {
-            // set from header
-            Identification from = new Identification(sipClient.Account.RegistrarUri);
-
             SipDialogue sd = sipClient.GetNewDialogue();
+            Identification from = new Identification(sipClient.Account.RegistrarUri, null, sd.DialogueId);
+
             await sd.SendSipRequestAsync(RequestMethods.Register, from);
         }
 
@@ -33,7 +29,7 @@ namespace SipClient.Extensions
 
                 request.Headers.From = from.ToString();
                 request.Headers.Contact = from.ToString();
-                request.Headers.CallId = sipDialogue.Id.ToString();
+                request.Headers.CallId = uriId.ToString();
 
                 if (to != null)
                     request.Headers.To = to.ToString();

@@ -19,7 +19,7 @@ namespace SipClient.Models
         /// <summary>
         ///     Unique dialogue identificator.
         /// </summary>
-        public Guid Id { get; set; }
+        public string DialogueId { get; set; }
 
         /// <summary>
         ///     List of destination uris (each destination uri has own unique id).
@@ -35,11 +35,11 @@ namespace SipClient.Models
         /// <summary>
         ///     Initialize new sip dialogue.
         /// </summary>
-        /// <param name="dialogueId">Dialogue id.</param>
-        public SipDialogue(Guid dialogueId, ISipTransactionLayer transactionLayer, SipUri destinationUri)
+        /// <param name="dialogueId">Unique dialogue Id..</param>
+        public SipDialogue(string dialogueId, ISipTransactionLayer transactionLayer, SipUri destinationUri)
         {
             TransactionLayer = transactionLayer;
-            Id = dialogueId;
+            DialogueId = dialogueId;
             AddNewDestinationUri(destinationUri);
         }
 
