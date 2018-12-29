@@ -27,35 +27,5 @@ namespace Javor.SipSerializer.Helpers
 
             return sipRequest;
         }
-
-        /// <summary>
-        ///     Create REGISTER request.
-        /// </summary>
-        /// <param name="sipRegisterOptions">REGISTER request options.</param>
-        /// <param name="viaHeader">Server/client host information packaged in via header.</param>
-        /// <returns>REGISTER request.</returns>
-        public static SipRequestMessage CreateSipRegister(SipRegisterOptions sipRegisterOptions, Via viaHeader = null)
-        {
-            if (!sipRegisterOptions.IsValid())
-                throw new MissingFieldException("Model validation failed.");
-
-            // create REGISTER message
-            SipRequestMessage register = new SipRequestMessage(
-                RequestMethods.Register,
-                sipRegisterOptions.RequestUri);
-
-            // fill REGISTER mandatory fields
-            register.Headers.To = sipRegisterOptions.To;
-            register.Headers.From = sipRegisterOptions.From;
-            register.Headers.CallId = sipRegisterOptions.CallId;
-            register.Headers.Contact = sipRegisterOptions.Contact;
-
-            if (viaHeader != null)
-            {
-                register.Headers.Via.Add(viaHeader);
-            }
-
-            return register;
-        }
     }
 }

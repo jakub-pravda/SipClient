@@ -14,12 +14,12 @@ namespace SipClient.Extensions
         public static async Task RegisterAsync(this ISipClient sipClient)
         {
             SipDialogue sd = sipClient.GetNewDialogue();
-            Identification from = new Identification(sipClient.Account.RegistrarUri, null, sd.DialogueId);
+            Identification to = new Identification(sipClient.Account.RegistrarUri, null);
 
-            await sd.SendSipRequestAsync(RequestMethods.Register, from);
+            await sd.SendSipRequestAsync(RequestMethods.Register, to);
         }
 
-        public static async Task SendSipRequestAsync(this SipDialogue sipDialogue, string requestMethod, Identification from, Identification to = null)
+        public static async Task SendSipRequestAsync(this SipDialogue sipDialogue, string requestMethod, Identification to, Identification from = null)
         {
             foreach (Guid uriId in sipDialogue.DestinationURIs.Keys)
             {
@@ -27,14 +27,14 @@ namespace SipClient.Extensions
                     requestMethod,
                     sipDialogue.DestinationURIs[uriId].ToString());
 
-                request.Headers.From = from.ToString();
-                request.Headers.Contact = from.ToString();
+                request.Headers.To = to;
+                request.Headers.Contact = to.ToString();
                 request.Headers.CallId = uriId.ToString();
 
-                if (to != null)
-                    request.Headers.To = to.ToString();
+                if (from != null)
+                    request.Headers.From = from;
                 else
-                    request.Headers.To = from.ToString();
+                    request.Headers.From = new Identification(to.Uri, sipDialogue.DialogueId);
 
                 await sipDialogue.TransactionLayer.SendSipRequest(request);
             }

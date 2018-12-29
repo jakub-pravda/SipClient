@@ -15,12 +15,10 @@ namespace Javor.SipSerializer.HeaderFields
         // TODO compact forms
 
         [HeaderName(HeaderFieldsNames.From)]
-        //public  From { get; set; }
-        public string From { get; set; }
+        public Identification From { get; set; }
          
         [HeaderName(HeaderFieldsNames.To)]
-        //public To To { get; set; }
-        public string To { get; set; }
+        public Identification To { get; set; }
         
         [HeaderName(HeaderFieldsNames.CallId)]
         public string CallId { get; set; }
