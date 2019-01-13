@@ -36,7 +36,7 @@ namespace SipClient.Extensions
                 else
                     request.Headers.From = new Identification(to.Uri, sipDialogue.DialogueId);
 
-                await sipDialogue.TransactionLayer.SendSipRequest(request);
+                await sipDialogue.TransactionLayer.SendSipRequestAsync(request);
             }
         }
     }

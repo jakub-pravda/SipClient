@@ -59,7 +59,10 @@ namespace SipClient.Extensions
                 User = builder.User
             };
 
-            return new DefaultSipClient(IPAddress.Parse(builder.ClientUri.Host), builder.ClientUri.Port, account);
+            DefaultSipClient sipClient = new DefaultSipClient(account);
+            sipClient.TransactionLayer.StartListening(builder.ClientUri.Host, builder.ClientUri.Port);
+
+            return sipClient;
 
             // TODO this method should create sip builder and save it to some temp variable... sip client definition should be handled by some final builder method
         }

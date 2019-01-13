@@ -11,16 +11,6 @@ using SipClient.Models;
 
 namespace SipClient.Instances
 {
-    public class TransactionUser : ISipTransactionUser
-    {
-        public List<Uri> DestinationUris { get; private set; }
-            = new List<Uri>();
-    }
-
-    public interface ISipTransactionUser
-    {
-    }
-
     /// <summary>
     ///     Trasnaction layer interface.
     /// </summary>
@@ -34,6 +24,15 @@ namespace SipClient.Instances
         /// <param name="destinationPort">User agent server port.</param>
         /// <param name="waitForResponse"></param>
         /// <returns></returns>
-        Task<bool> SendSipRequest(SipRequestMessage request, bool waitForResponse = false);
+        Task<bool> SendSipRequestAsync(SipRequestMessage request, bool waitForResponse = false);
+
+        /// <summary>
+        ///     Start with listening on the designated ip address:port
+        /// </summary>
+        /// <param name="ipAddress"></param>
+        /// <param name="port"></param>
+        /// <returns></returns>
+        void StartListening(string ipAddress, int port);
+        void StopListening();
     }
 }

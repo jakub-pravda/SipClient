@@ -16,6 +16,8 @@ namespace SipClient.Models
         /// </summary>
         public string TransactionId { get; }
 
+        public TransactionStatus Status { get; private set; }
+
         /// <summary>
         ///     Provisional response list (1xx responses).
         /// </summary>
@@ -24,12 +26,12 @@ namespace SipClient.Models
         /// <summary>
         ///     Initial transaction request.
         /// </summary>
-        public SipRequestMessage InitialRequest { get; set; }
+        public SipRequestMessage InitialRequest { get; }
 
         /// <summary>
         ///     Final response message (non 1xx message).
         /// </summary>
-        public List<SipReponseMessage> FinalResponses { get; } = new List<SipReponseMessage>();
+        public SipReponseMessage FinalResponse { get; private set; }
 
         /// <summary>
         ///     Initialize new transaction.
@@ -43,6 +45,38 @@ namespace SipClient.Models
 
             int viaCount = initialRequest.Headers.Via.Count;
             TransactionId = initialRequest.Headers.Via.Last().Branch;
+            Status = TransactionStatus.INIT;
+        }
+
+        public bool SetResponse(SipReponseMessage sipResponse)
+        {
+            if (sipResponse.StatusLine.StatusCode.StartsWith("1"))
+            {
+                // provisional response
+                ProvisionalResponses.Add(sipResponse);
+
+                if (Status == TransactionStatus.INIT)
+                {
+                    Status = TransactionStatus.PROVISIONAL;
+                }
+                else if (Status != TransactionStatus.PROVISIONAL)
+                {
+                    throw new ArgumentException("Invalid state of transaction status!");
+                }
+
+                return false;
+            }
+
+            FinalResponse = sipResponse;
+            Status = TransactionStatus.COMPLETE;
+            return true;
+        }
+
+        public enum TransactionStatus
+        {
+            INIT,
+            PROVISIONAL,
+            COMPLETE
         }
     }
 }

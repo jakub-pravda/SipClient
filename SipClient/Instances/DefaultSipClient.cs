@@ -30,18 +30,16 @@ namespace SipClient
 
         public ISipTransactionLayer TransactionLayer { get; }
 
-        public DefaultSipClient(IPAddress listenOn, int port, SipClientAccount account)
+        public DefaultSipClient(SipClientAccount account)
         {
-            if (listenOn == null) throw new ArgumentNullException("Client ip address cann't be null.");
             if (account == null) throw new ArgumentNullException("Invalid account.");
-            if (port < 1 || port > 65535) throw new ArgumentException($"Invalid port {port}.");
 
             Account = account;
-            TransactionLayer = new TransactionAgent(listenOn, port, Account.RegistrarUri);
+            TransactionLayer = new TransactionAgent(Account.RegistrarUri);
         }
 
-        public DefaultSipClient(IPAddress listenOn, int port, SipClientAccount account, IEnumerable<string> allowedMethods)
-            : this(listenOn, port, account)
+        public DefaultSipClient(SipClientAccount account, IEnumerable<string> allowedMethods)
+            : this(account)
         {
             AllowedMethods = allowedMethods ?? throw new ArgumentNullException("Allowed methods cann't be null.");
         }

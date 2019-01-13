@@ -1,17 +1,29 @@
 ﻿using Javor.SipSerializer;
 using Javor.SipSerializer.HeaderFields;
+using Javor.SipSerializer.Helpers;
 using Javor.SipSerializer.Schemes;
 using SipClient.Logging;
 using SipClient.Models;
 using System;
+using System.Buffers;
 using System.Collections.Concurrent;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using static Javor.SipSerializer.SipMessage;
 
 namespace SipClient.Instances
 {
+    /// <summary>
+    ///     Transaction complete event handler.
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    public delegate void TransactionCompleteHandler(object sender, TransactionCompleteEventArgs e);
+
     /// <summary>
     ///     Implementation of Sip transaction layer.
     /// </summary>
@@ -19,6 +31,8 @@ namespace SipClient.Instances
     {
         private readonly ILog _logger = LogProvider.GetCurrentClassLogger();
         private bool _disposed = false;
+        private Via _via;
+        private CancellationTokenSource _cancellationTokenSource;
 
         /// <summary>
         ///     Remote connection info.
@@ -26,19 +40,19 @@ namespace SipClient.Instances
         public SipUri SipUri { get; }
 
         /// <summary>
-        ///     Local ip address on which is SIP client listening.
+        ///     Listening ip address.
         /// </summary>
-        public IPAddress LocalIpAddress { get; }
+        public string ListeningOnIp { get; private set; }
 
         /// <summary>
-        ///     Local port on which is sip clilent listening
+        ///     Transaction complete event.
         /// </summary>
-        public int LocalPort { get; }
+        public event TransactionCompleteHandler TransactionComplete;
 
         /// <summary>
         ///    Transport protocol used for message transport.
         /// </summary>
-        TransportProtocol TransportProtocol { get; } = TransportProtocol.TCP; // only TCP is valid at this time
+        TransportProtocol TransportProtocol { get; } = TransportProtocol.UDP; // only UDP is valid at this time
 
         ConcurrentDictionary<string, Transaction> Transactions { get; }
             = new ConcurrentDictionary<string, Transaction>();
@@ -47,11 +61,9 @@ namespace SipClient.Instances
         ///     Initialize new transaction layer.
         /// </summary>
         /// <param name="connectionInfo"></param>
-        public TransactionAgent(IPAddress localIpAddress, int localPort, SipUri destinationSipUri)
+        public TransactionAgent(SipUri destinationSipUri)
         {
             SipUri = destinationSipUri;
-            LocalPort = localPort;
-            LocalIpAddress = localIpAddress;
         }
 
         /// <summary>
@@ -62,7 +74,7 @@ namespace SipClient.Instances
         /// <param name="destinationPort">User agent server port.</param>
         /// <param name="waitForResponse"></param>
         /// <returns></returns>
-        public async Task<bool> SendSipRequest(SipRequestMessage request, bool waitForResponse = false)
+        public async Task<bool> SendSipRequestAsync(SipRequestMessage request, bool waitForResponse = false)
         {
             if (request == null) throw new ArgumentNullException("Request message cann't be null.");
 
@@ -75,17 +87,72 @@ namespace SipClient.Instances
             return sendResult;
         }
 
+        /// <summary>
+        ///     Start listening.
+        /// </summary>
+        /// <param name="ipAddress"></param>
+        /// <param name="port"></param>
+        /// <returns></returns>
+        public void StartListening(string ipAddress, int port)
+        {
+            ListeningOnIp = ipAddress;
+            IPAddress ipAddr = IPAddress.Parse(ipAddress);
+            IPEndPoint ep = new IPEndPoint(ipAddr, port);
+
+            StartListeningAsync(ep);
+        }
+
+        /// <summary>
+        ///     Start listening.
+        /// </summary>
+        /// <param name="localEP"></param>
+        /// <returns></returns>
+        public void StartListeningAsync(IPEndPoint localEP)
+        {
+            _logger.Debug("Starting listener.");
+
+            Socket listenSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+            listenSocket.Bind(localEP);
+
+            _via = new Via(localEP.Address.ToString(), localEP.Port, TransportProtocol);
+            _cancellationTokenSource = new CancellationTokenSource();
+
+            _logger.Info($"Listener started at {localEP.Address}:{localEP.Port}.");
+
+            EndPoint ie = new IPEndPoint(IPAddress.Any, 0);
+            BufferSegment segment = new BufferSegment() { Buffer = ArrayPool<byte>.Shared.Rent(1024) };
+
+            Tuple<Socket, BufferSegment> container = new Tuple<Socket, BufferSegment>(listenSocket, segment);
+            listenSocket.BeginReceiveFrom(segment.Buffer, 0, 1024, SocketFlags.None, ref ie, Receive, container);
+        }
+
+        public void StopListening()
+        {
+            _logger.Debug("Stopping listening agent.");
+            _cancellationTokenSource.Cancel();
+            _logger.Info("Listening agent stopped.");
+        }
+
+        protected virtual void OnTransactionComplete(Transaction transaction)
+        {
+            TransactionCompleteHandler del = TransactionComplete as TransactionCompleteHandler;
+            if (del != null)
+            {
+                del(this, new TransactionCompleteEventArgs(transaction));
+            }
+        }
+
         private void SetNewTransaction(SipRequestMessage initialRequest)
         {
-            Via via = new Via(LocalIpAddress.ToString(), LocalPort, TransportProtocol);
-            
+            if (_via == null) throw new ArgumentNullException("VIA SIP header cann't be empty. Listening agent was not properly started.");
+
             // generate new VIA message
-            initialRequest.Headers.Via.Add(via);
+            initialRequest.Headers.Via.Add(_via);
 
             // generate new transaction
             Transaction tr = new Transaction(initialRequest);
 
-            bool result = Transactions.TryAdd(via.Branch, tr);
+            bool result = Transactions.TryAdd(_via.Branch, tr);
         }
 
         private async Task<bool> SendData(byte[] data, string domainAddress, int destinationPort)
@@ -97,6 +164,7 @@ namespace SipClient.Instances
                 // domain address is uri
                 destinationIp = (await Dns.GetHostAddressesAsync(domainAddress))[0];
             }
+
             return await SendData(data, destinationIp, destinationPort);
         }
 
@@ -119,6 +187,70 @@ namespace SipClient.Instances
             }
         }
 
+        private void Receive(IAsyncResult result)
+        {
+            Tuple<Socket, BufferSegment> container = (Tuple<Socket, BufferSegment>)result.AsyncState;
+            Socket listenSocket = container.Item1;
+            BufferSegment bs = container.Item2;
+
+            EndPoint clientEp = new IPEndPoint(IPAddress.Any, 0);
+            int recvBytes = listenSocket.EndReceiveFrom(result, ref clientEp);
+
+            string recvMsg;
+            while (true)
+            {
+                _logger.Debug("Recieving new bunch of data from socket.");
+                recvMsg = Encoding.ASCII.GetString(bs.Buffer, 0, recvBytes);
+
+                if (ParsingHelpers.IsSipMessageComplete(recvMsg)) break;
+                throw new NotImplementedException("Message wasn't full recieved at one method calling.");
+            }
+
+            // process sip message
+            SipMessageType messageType = ParsingHelpers.GetSipMessageType(recvMsg);
+
+            SipMessage sipMessage;
+            if (messageType == SipMessageType.Request)
+            {
+                _logger.Debug("SIP REQUEST message recognized on input.");
+                throw new NotImplementedException("SIP REQUEST decoder not yet implemented.");
+            }
+            else if (messageType == SipMessageType.Response)
+            {
+                _logger.Debug("SIP RESPONSE message recognized on input.");
+                sipMessage = SipReponseMessage.CreateSipResponse(recvMsg);
+            }
+            else
+            {
+                _logger.Warn($"Cann't recognize if incomming SIP message is type of REQUEST or RESPONSE:\n {recvMsg}");
+                throw new ArgumentException("Incomming sip message is invalid... unknown message type.");
+            }
+
+            Via transactionInfo = sipMessage.Headers.Via.First();
+            if (transactionInfo.IpAddress == ListeningOnIp)
+            {
+                // handle local transaction
+                bool transactionResult = Transactions.TryGetValue(transactionInfo.Branch, out Transaction transaction);
+                if (!transactionResult)
+                {
+                    throw new NotImplementedException($"Cann't find transaction with transaction id {transactionInfo.Branch}.");
+                }
+
+                if (transaction.SetResponse((SipReponseMessage)sipMessage))
+                {
+                    OnTransactionComplete(transaction);
+                }
+                else
+                {
+                    throw new NotImplementedException("Provisional response handling not yet implemented.");
+                }
+            }
+            else
+            {
+                throw new NotImplementedException("Transaction is determined for different endpoint.");
+            }
+        }
+
         /// <summary>
         ///     Dispose.
         /// </summary>
@@ -138,7 +270,7 @@ namespace SipClient.Instances
 
             if (disposing)
             {
-                // do something on dispose
+                StopListening();
             }
 
             _disposed = true;
@@ -147,6 +279,30 @@ namespace SipClient.Instances
         ~TransactionAgent()
         {
             Dispose(false);
+        }
+    }
+
+    class BufferSegment
+    {
+        public byte[] Buffer { get; set; }
+        public int Count { get; set; }
+
+        public int Remaining
+        {
+            get
+            {
+                return Buffer.Length - Count;
+            }
+        }
+    }
+
+    public class TransactionCompleteEventArgs
+    {
+        public Transaction Transaction { get; private set; }
+
+        public TransactionCompleteEventArgs(Transaction transaction)
+        {
+            Transaction = Transaction;
         }
     }
 }
