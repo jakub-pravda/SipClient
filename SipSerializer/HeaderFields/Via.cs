@@ -14,7 +14,6 @@ namespace Javor.SipSerializer.HeaderFields
         /// </summary>
         public Via()
         {
-
         }
 
         /// <summary>
@@ -24,6 +23,8 @@ namespace Javor.SipSerializer.HeaderFields
         public Via(string viaHeader)
             : base(viaHeader)
         {
+            if (string.IsNullOrEmpty(viaHeader)) throw new ArgumentNullException("Invalid asii via header.");
+            ParseVia(viaHeader);
         }
 
         /// <summary>
@@ -91,11 +92,21 @@ namespace Javor.SipSerializer.HeaderFields
             return $"{Version}/{TransportProtocol.ToString()} {IpAddress}:{Port.ToString()};branch={Branch}";
         }
 
-
         private void SetNewBranchParameter()
         {
             Branch = string.Format("z9hG4bK{0}", Guid.NewGuid().ToString("N"));
         }
 
+        private void ParseVia(string viaAscii)
+        {
+            string[] splitted = viaAscii.Split(new char[] { '/', ' ', ':', ';', '=' });
+
+            if (splitted.Length != 7)
+                throw new ArgumentException("Invalid length of via header.");
+
+            // setting internal
+            IpAddress = splitted[3];
+            Branch = splitted[6];
+        }
     }
 }

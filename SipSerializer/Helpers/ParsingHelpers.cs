@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Javor.SipSerializer.HeaderFields;
+using System;
 
 namespace Javor.SipSerializer.Helpers
 {
@@ -114,6 +115,56 @@ namespace Javor.SipSerializer.Helpers
 
             errorMessage = null;
             return true;
+        }
+
+        /// <summary>
+        ///     Check if ascii formatted sip message is complete.
+        /// </summary>
+        /// <param name="sipMessage">Ascii formatted sip message.</param>
+        /// <returns>Returns true if sip message is complete. Otherwise returns false.</returns>
+        public static bool IsSipMessageComplete(string sipMessage)
+        {
+            if (string.IsNullOrEmpty(sipMessage)) return false;
+
+            int len = sipMessage.Length;
+            if (sipMessage[len - 1] != '\n') return false;
+            if (sipMessage[len - 2] != '\r') return false;
+            if (sipMessage[len - 3] != '\n') return false;
+            if (sipMessage[len - 4] != '\r') return false;
+
+            string value = GetSipMessageHeaderValueOrDefault(HeaderFieldsNames.ContentLength, sipMessage);
+            if (value == null) return false;
+
+            bool convResult = int.TryParse(value, out int convValue);
+            if (!convResult) return false;
+
+            if (convValue != 0)
+            {
+                // check body
+                throw new NotImplementedException("Sip body checking not yet implemented");
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        ///     Get value of header from ascii formatted sip message.
+        /// </summary>
+        /// <param name="headerName">Header should be found.</param>
+        /// <param name="sipMessage">Ascii formatted sip message.</param>
+        /// <returns>Value of header or null when header doesn`t exists in the sip message.</returns>
+        public static string GetSipMessageHeaderValueOrDefault(string headerName, string sipMessage)
+        {
+            int indexHeader = sipMessage.IndexOf(headerName);
+            if (indexHeader == -1) return null;
+
+            int indexSeparator = sipMessage.IndexOf(':', indexHeader) + 1; // separator must be ommited
+            if (indexSeparator == -1) return null;
+
+            int indexEndLine = sipMessage.IndexOf("\r\n", indexSeparator);
+            if (indexEndLine == -1) return null;
+
+            return sipMessage.Substring(indexSeparator, indexEndLine - indexSeparator);
         }
     }
 }

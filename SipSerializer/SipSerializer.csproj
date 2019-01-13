@@ -5,6 +5,9 @@
     <AssemblyName>Javor.SipSerializer</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="System.Memory" Version="4.5.2" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\SdpSerializer\SdpSerializer.csproj" />
   </ItemGroup>
 </Project>
