@@ -16,11 +16,6 @@ namespace SipClient
         SipClientAccount Account { get; }
 
         /// <summary>
-        ///     Transaction user layer responsible for dialog handling.
-        /// </summary>
-        ISipTransactionUser TransactionUser { get; }
-
-        /// <summary>
         ///     Transaction layer responsible for sip message sending.
         /// </summary>
         ISipTransactionLayer TransactionLayer { get; }

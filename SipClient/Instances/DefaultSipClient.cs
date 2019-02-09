@@ -24,8 +24,6 @@ namespace SipClient
 
         public SipClientAccount Account { get; private set; }
 
-        public ISipTransactionUser TransactionUser { get; private set; }
-
         public IEnumerable<string> AllowedMethods { get; set; }
 
         public ISipTransactionLayer TransactionLayer { get; }
