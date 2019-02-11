@@ -30,17 +30,31 @@ namespace SipClient.Models
         /// <summary>
         ///     Transaction layer for this sip dialogue.
         /// </summary>
-        public ISipTransactionLayer TransactionLayer { get; }
+        public ISipTransactionLayer TransactionLayer { get; private set; }
+
+        /// <summary>
+        ///     Dialogue sip response handler.
+        /// </summary>
+        public ISipResponseHandler ResponseHandler { get; private set; }
+
+        public SipDialogue(Action<ISipResponseHandler> sipResponseHandler)
+        {
+            // TODO 
+        }
 
         /// <summary>
         ///     Initialize new sip dialogue.
         /// </summary>
-        /// <param name="dialogueId">Unique dialogue Id..</param>
+        /// <param name="dialogueId">Unique dialoddgue Id..</param>
         public SipDialogue(string dialogueId, ISipTransactionLayer transactionLayer, SipUri destinationUri)
         {
             TransactionLayer = transactionLayer;
+            TransactionLayer.TransactionComplete += TransactionAgent_TransactionComplete;
+
             DialogueId = dialogueId;
             AddNewDestinationUri(destinationUri);
+
+            ResponseHandler = new DefaultResponseHandler();
         }
 
         public void AddNewDestinationUri(SipUri destinationUri)
@@ -56,6 +70,11 @@ namespace SipClient.Models
             {
                 AddNewDestinationUri(destinationUri);
             }
+        }
+
+        private void TransactionAgent_TransactionComplete(object sender, TransactionCompleteEventArgs e)
+        {
+            ResponseHandler.ProcessSipMessage(e.Transaction.FinalResponse);
         }
 
         private int GetSeqNumber()

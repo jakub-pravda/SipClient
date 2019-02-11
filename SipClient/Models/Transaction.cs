@@ -21,7 +21,7 @@ namespace SipClient.Models
         /// <summary>
         ///     Provisional response list (1xx responses).
         /// </summary>
-        public List<SipReponseMessage> ProvisionalResponses { get; } = new List<SipReponseMessage>(4);
+        public List<SipResponseMessage> ProvisionalResponses { get; } = new List<SipResponseMessage>(4);
 
         /// <summary>
         ///     Initial transaction request.
@@ -31,7 +31,7 @@ namespace SipClient.Models
         /// <summary>
         ///     Final response message (non 1xx message).
         /// </summary>
-        public SipReponseMessage FinalResponse { get; private set; }
+        public SipResponseMessage FinalResponse { get; private set; }
 
         /// <summary>
         ///     Initialize new transaction.
@@ -48,7 +48,7 @@ namespace SipClient.Models
             Status = TransactionStatus.INIT;
         }
 
-        public bool SetResponse(SipReponseMessage sipResponse)
+        public bool SetResponse(SipResponseMessage sipResponse)
         {
             if (sipResponse.StatusLine.StatusCode.StartsWith("1"))
             {

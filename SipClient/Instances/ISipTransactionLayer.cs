@@ -17,6 +17,10 @@ namespace SipClient.Instances
     public interface ISipTransactionLayer
     {
         /// <summary>
+        ///     Transaction complete event raiser.
+        /// </summary>
+        event TransactionCompleteHandler TransactionComplete;
+        /// <summary>
         ///     Send sip request message as new transaction.
         /// </summary>
         /// <param name="message">Sip message.</param>

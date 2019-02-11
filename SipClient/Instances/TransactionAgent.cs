@@ -218,7 +218,7 @@ namespace SipClient.Instances
             else if (messageType == SipMessageType.Response)
             {
                 _logger.Debug("SIP RESPONSE message recognized on input.");
-                sipMessage = SipReponseMessage.CreateSipResponse(recvMsg);
+                sipMessage = SipResponseMessage.CreateSipResponse(recvMsg);
             }
             else
             {
@@ -236,8 +236,9 @@ namespace SipClient.Instances
                     throw new NotImplementedException($"Cann't find transaction with transaction id {transactionInfo.Branch}.");
                 }
 
-                if (transaction.SetResponse((SipReponseMessage)sipMessage))
+                if (transaction.SetResponse((SipResponseMessage)sipMessage))
                 {
+                    _logger.Info($"Transacion {transactionInfo.Branch} complete.");
                     OnTransactionComplete(transaction);
                 }
                 else
@@ -302,7 +303,7 @@ namespace SipClient.Instances
 
         public TransactionCompleteEventArgs(Transaction transaction)
         {
-            Transaction = Transaction;
+            Transaction = transaction;
         }
     }
 }
