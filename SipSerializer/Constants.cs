@@ -26,4 +26,19 @@ namespace Javor.SipSerializer
         /// </summary>
         public const string Register = "REGISTER";
     }
+
+    public static class ResponseCodes 
+    {
+        #region 2xx successful responses
+        /// <summary>
+        ///     200 OK status code.
+        /// </summary>
+        public const string StatusCode200Ok = "200";
+
+        /// <summary>
+        ///     202 ACCEPTED status code.
+        /// </summary>
+        public const string StatusCode202Accepted = "202";
+        #endregion
+    }
 }

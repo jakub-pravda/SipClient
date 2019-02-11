@@ -52,7 +52,7 @@ namespace Javor.SipSerializer
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder();
-            sb.AppendLine(RequestLine.ToString());
+            sb.Append(RequestLine.ToString());
             sb.Append(base.ToString());
 
             return sb.ToString();

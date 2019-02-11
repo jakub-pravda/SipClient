@@ -14,7 +14,7 @@ namespace Javor.SipSerializer.Extensions
             sb.Append(headerName);
             sb.Append(':');
             sb.Append(value);
-            sb.AppendLine();
+            sb.Append(ABNF.CRLF);
 
             return sb;
         }

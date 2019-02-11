@@ -79,7 +79,7 @@ namespace Javor.SipSerializer
         /// <returns></returns>
         public override string ToString()
         {
-            return $"{Method} {Uri.AbsoluteUri} {Version}";
+            return $"{Method} {Uri.AbsoluteUri} {Version} {ABNF.CRLF}";
         }
     }
 
