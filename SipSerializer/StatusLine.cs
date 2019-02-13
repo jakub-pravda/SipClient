@@ -54,7 +54,7 @@ namespace Javor.SipSerializer
 
         private void DeserializeStatusLine(string statusLine)
         {
-            var parsed = statusLine.Trim().Split(ABNF.SP);
+            var parsed = statusLine.Trim().Split(new char[] { ABNF.SP }, 3);
 
             if (!ParsingHelpers.IsStatusLine(parsed, out string err))
             {

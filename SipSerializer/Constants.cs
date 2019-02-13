@@ -25,6 +25,11 @@ namespace Javor.SipSerializer
         ///     Register.
         /// </summary>
         public const string Register = "REGISTER";
+
+        /// <summary>
+        ///     Options.
+        /// </summary>
+        public const string Options = "OPTIONS";
     }
 
     public static class ResponseCodes 

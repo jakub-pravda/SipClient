@@ -45,7 +45,7 @@ namespace Javor.SipSerializer.Helpers
         /// <returns>True if provided string is status line. False otherwise.</returns>
         public static bool IsStatusLine(string statusLine, out string errorMessage)
         {
-            string[] parsed = statusLine.Trim().Split(ABNF.SP);
+            string[] parsed = statusLine.Trim().Split(new char[] { ABNF.SP }, 3);
 
             bool result = IsStatusLine(parsed, out string err);
 
