@@ -1,6 +1,8 @@
 using Javor.SipSerializer.Attributes;
 using Javor.SipSerializer.Exceptions;
 using Javor.SipSerializer.HeaderFields;
+using Javor.SipSerializer.Helpers;
+using Javor.SipSerializer.Schemes;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -16,7 +18,7 @@ namespace Javor.SipSerializer
         /// <summary>
         ///     Request line.
         /// </summary>
-        public RequestLine RequestLine { get; }
+        public RequestLine RequestLine { get; private set; }
 
         private SipRequestMessage()
             : base()
@@ -24,17 +26,17 @@ namespace Javor.SipSerializer
             Type = SipMessageType.Request;
         }
 
-        public SipRequestMessage(string requestType, Uri uri, int cSeq = 0)
+        public SipRequestMessage(string requestType, SipUri uri, int cSeq = 0)
             : this()
         {
-            RequestLine = new RequestLine(requestType, uri);
+            RequestLine = new RequestLine(requestType, uri, Constants.SipVersion);
             Headers.CSeq = new CSeq(cSeq, RequestLine.Method);
         }
 
         public SipRequestMessage(string requestType, string uri, int cSeq = 0)
             : this()
         {
-            RequestLine = new RequestLine(requestType, uri);
+            RequestLine = new RequestLine(requestType, new SipUri(uri), Constants.SipVersion);
             Headers.CSeq = new CSeq(cSeq, RequestLine.Method);
         }
 
@@ -43,6 +45,22 @@ namespace Javor.SipSerializer
         {
             RequestLine = requestLine;
             Headers.CSeq = new CSeq(cSeq, RequestLine.Method);
+        }
+
+        /// <summary>
+        ///     Deserialize and set request line.
+        /// </summary>
+        /// <param name="requestLine">Request line in string form.</param>
+        public void DeserializeAndSetRequestLine(string requestLine)
+        {
+            var parsed = requestLine.Trim().Split(ABNF.SP);
+
+            if (!ParsingHelpers.IsRequestLine(parsed, out string err))
+            {
+                throw new SipParsingException(err);
+            }
+            
+            RequestLine = new RequestLine(parsed[0], new SipUri(parsed[1]), Constants.SipVersion);
         }
 
         /// <summary>

@@ -1,5 +1,5 @@
 using Javor.SipSerializer.Exceptions;
-using Javor.SipSerializer.Helpers;
+using Javor.SipSerializer.Schemes;
 using System;
 
 namespace Javor.SipSerializer
@@ -7,70 +7,35 @@ namespace Javor.SipSerializer
     /// <summary>
     ///     Start line for requests
     /// </summary>
-    public class RequestLine
+    public struct RequestLine
     {
-        /// <summary>
-        ///     Initialize new request line.
-        /// </summary>
-        public RequestLine(string requestMethod, string destinationUri)
-        {
-            if (requestMethod == null || destinationUri == null)
-                throw new ArgumentNullException("Input parameters cann't be null.");
 
-            Method = requestMethod;
-            Uri = new Uri(destinationUri);
-        }
-
-        public RequestLine(string requestMethod, Uri destinationUri)
-        {
-            if (requestMethod == null || destinationUri == null)
-                throw new ArgumentNullException("Input parameters cann't be null.");
-
-            Method = requestMethod;
-            Uri = destinationUri;
-        }
-
-        /// <summary>
-        ///     Initialize new request line.
-        /// </summary>
-        /// <param name="requestLine">Request line in raw format.</param>
-        public RequestLine(string requestLine)
-        {
-            DeserializeRequestLine(requestLine);
-            OriginalString = requestLine;
-        }
-        
         /// <summary>
         ///     Request method.
         /// </summary>
-        public string Method { get; set; }
+        public string Method;
         
         /// <summary>
         ///     Request uri.
         /// </summary>
-        public Uri Uri { get; set; }
+        public SipUri Uri;
 
         /// <summary>
         ///     Sip version.
         /// </summary>
-        public string Version { get; } = Constants.SipVersion;
+        public string Version;
 
         /// <summary>
-        ///     Raw format of the request line.
+        ///     Fill request line structure.
         /// </summary>
-        public string OriginalString { get; private set; }
-
-        private void DeserializeRequestLine(string requestLine)
+        /// <param name="method">Request method.</param>
+        /// <param name="uri">Request Uri.</param>
+        /// <param name="version">Sip version.</param>
+        public RequestLine(string method, SipUri uri, string version)
         {
-            var parsed = requestLine.Trim().Split(ABNF.SP);
-
-            if (!ParsingHelpers.IsRequestLine(parsed, out string err))
-            {
-                throw new SipParsingException(err);
-            }
-            
-            Method = parsed[0];
-            Uri = new Uri(parsed[1]);
+            Method = method;
+            Uri = uri;
+            Version = version;
         }
 
         /// <summary>
@@ -79,7 +44,7 @@ namespace Javor.SipSerializer
         /// <returns></returns>
         public override string ToString()
         {
-            return $"{Method} {Uri.AbsoluteUri} {Version} {ABNF.CRLF}";
+            return $"{Method} {Uri} {Version} {ABNF.CRLF}";
         }
     }
 
