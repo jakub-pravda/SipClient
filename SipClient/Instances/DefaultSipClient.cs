@@ -6,6 +6,8 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using Javor.SipSerializer;
+using Javor.SipSerializer.HeaderFields;
+using SipClient.Extensions;
 using SipClient.Instances;
 using SipClient.Logging;
 using SipClient.Models;
@@ -42,10 +44,29 @@ namespace SipClient
             AllowedMethods = allowedMethods ?? throw new ArgumentNullException("Allowed methods cann't be null.");
         }
 
-        public SipDialogue GetNewDialogue()
+        /// <summary>
+        ///     Creates new dialogue for communication with registrar server.
+        /// </summary>
+        /// <returns>New sip dialogue.</returns>
+        public SipDialogue GetNewDialogue(string initRequest)
         {
-            SipDialogue sd = new SipDialogue(Guid.NewGuid().ToString(), TransactionLayer, Account.RegistrarUri);
+            SipDialogue sd = new SipDialogue(
+                initRequest, 
+                Account.RegistrarUri, 
+                Account.GetAccountIdentification(),
+                TransactionLayer);
             return sd;
+        }
+
+        /// <summary>
+        ///     Creates new dialogue for communication with sip endpoints.
+        /// </summary>
+        /// <param name="to">Endpoint identification.</param>
+        /// <returns>New sip dialogue.</returns>
+        public SipDialogue GetNewDialogue(Identification to)
+        {
+            // in case that i would need call to some number, sip client doesnt know TO destination
+            throw new NotImplementedException();
         }
 
         public void Dispose()

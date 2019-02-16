@@ -212,12 +212,10 @@ namespace SipClient.Instances
             SipMessage sipMessage;
             if (messageType == SipMessageType.Request)
             {
-                _logger.Debug("SIP REQUEST message recognized on input.");
                 throw new NotImplementedException("SIP REQUEST decoder not yet implemented.");
             }
             else if (messageType == SipMessageType.Response)
             {
-                _logger.Debug("SIP RESPONSE message recognized on input.");
                 sipMessage = SipResponseMessage.CreateSipResponse(recvMsg);
             }
             else
@@ -225,6 +223,7 @@ namespace SipClient.Instances
                 _logger.Warn($"Cann't recognize if incomming SIP message is type of REQUEST or RESPONSE:\n {recvMsg}");
                 throw new ArgumentException("Incomming sip message is invalid... unknown message type.");
             }
+            _logger.Debug($"New sip message received:\n{sipMessage}");
 
             Via transactionInfo = sipMessage.Headers.Via.First();
             if (transactionInfo.IpAddress == ListeningOnIp)

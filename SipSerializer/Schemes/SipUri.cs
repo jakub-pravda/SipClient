@@ -39,10 +39,19 @@ namespace Javor.SipSerializer.Schemes
             Port = port;
         }
 
+        public SipUri(string sipUri)
+        {
+            PrivateDeserializeSipuri(sipUri);
+        }
+
+        public const string SipScheme = "sip";
+        public const string SipsScheme = "sips";
+
         /// <summary>
         ///     SIP scheme
         /// </summary>
-        public Scheme Scheme { get; set; }
+        public string Scheme { get; set; }
+            = SipScheme;
 
         /// <summary>
         ///     User name (eg. extension, name, etc.)
@@ -80,6 +89,19 @@ namespace Javor.SipSerializer.Schemes
             }
 
             return sb.ToString();
+        }
+
+        private void PrivateDeserializeSipuri(string sipUri)
+        {
+            // sip:80362@algocloud.net
+            string[] splitted = sipUri.Split(new char[] {':', '@'});
+
+            Scheme = splitted[0];
+            User = splitted[1];
+            Host = splitted[2];
+
+            if (splitted.Length > 3)
+                Port = int.Parse(splitted[3]);
         }
     }
 }

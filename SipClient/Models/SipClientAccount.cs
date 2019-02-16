@@ -18,26 +18,5 @@ namespace SipClient.Models
         public SipUri RegistrarUri { get; set; }
 
         public TransportProtocol TransportProtocol { get; set; }
-
-
-
-        public SipClientAccount()
-        {
-            
-        }
-
-        public SipClientAccount(string username, string password, string registrarUri)
-        {
-            if (string.IsNullOrEmpty(username))
-                throw new ArgumentNullException("Username must be valid username."); // TODO username check?
-            if (registrarUri == null)
-                throw new ArgumentNullException("Invalid registrar uri.");
-
-            Name = username;
-            User = username;
-            AuthenticationUser = username;
-            Password = password;
-            //RegistrarUri = registrarUri;
-        }
     }
 }

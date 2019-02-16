@@ -21,9 +21,17 @@ namespace SipClient
         ISipTransactionLayer TransactionLayer { get; }
 
         /// <summary>
-        ///     Creates and return new dialogue.
+        ///     Creates and returns new dialogue.
         /// </summary>
+        /// <param name="initRequest">Initialization dialogue request.</param>
         /// <returns>Sip dialogue.</returns>
-        SipDialogue GetNewDialogue();
+        SipDialogue GetNewDialogue(string initRequest);
+
+        /// <summary>
+        ///     Creates and returns new dialogue.
+        /// </summary>
+        /// <param name="to">Endpoint identification.</param>
+        /// <returns>Sip dialogue.</returns>
+        SipDialogue GetNewDialogue(Identification to);
     }
 }

@@ -5,6 +5,7 @@ using SipClient.Instances;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace SipClient.Models
 {
@@ -15,6 +16,9 @@ namespace SipClient.Models
     {
         private int _lastSeqNumber = 0;
         private static readonly object _locker = new object();
+        private ISipTransactionLayer _transactionLayer;
+        private ISipResponseHandler _responseHandler;
+        private string _initRequest;
 
         /// <summary>
         ///     Unique dialogue identificator.
@@ -22,59 +26,80 @@ namespace SipClient.Models
         public string DialogueId { get; set; }
 
         /// <summary>
-        ///     List of destination uris (each destination uri has own unique id).
+        ///     Dialogue state.
         /// </summary>
-        public Dictionary<Guid, SipUri> DestinationURIs { get; set; }
-            = new Dictionary<Guid, SipUri>();
+        public DialogueState State { get; private set; }
+             = DialogueState.CREATED;
 
         /// <summary>
-        ///     Transaction layer for this sip dialogue.
+        ///     FROM dialogue identification.
         /// </summary>
-        public ISipTransactionLayer TransactionLayer { get; private set; }
+        public Identification From { get; set; }
 
         /// <summary>
-        ///     Dialogue sip response handler.
+        ///     TO dialogue identification.
         /// </summary>
-        public ISipResponseHandler ResponseHandler { get; private set; }
+        public Identification To { get; set; }
+
+        /// <summary>
+        ///     Request uri.
+        /// </summary>
+        public SipUri RequestUri { get; private set; }
 
         public SipDialogue(Action<ISipResponseHandler> sipResponseHandler)
         {
-            // TODO 
+            throw new NotImplementedException();
         }
 
         /// <summary>
         ///     Initialize new sip dialogue.
         /// </summary>
-        /// <param name="dialogueId">Unique dialoddgue Id..</param>
-        public SipDialogue(string dialogueId, ISipTransactionLayer transactionLayer, SipUri destinationUri)
+        /// <param name="initRequestMethod"></param>
+        /// <param name="requestUri"></param>
+        /// <param name="from"></param>
+        /// <param name="transactionLayer"></param>
+        public SipDialogue(string initRequestMethod, SipUri requestUri, Identification from, ISipTransactionLayer transactionLayer)
         {
-            TransactionLayer = transactionLayer;
-            TransactionLayer.TransactionComplete += TransactionAgent_TransactionComplete;
-
-            DialogueId = dialogueId;
-            AddNewDestinationUri(destinationUri);
-
-            ResponseHandler = new DefaultResponseHandler();
-        }
-
-        public void AddNewDestinationUri(SipUri destinationUri)
-        {
-            if (destinationUri == null) throw new ArgumentNullException("Invalid destination URI.");
+            From = from;
+            To = new Identification(from.Uri, null);
+            RequestUri = requestUri;
             
-            DestinationURIs.Add(Guid.NewGuid(), destinationUri);
+            _transactionLayer = transactionLayer;
+            _transactionLayer.TransactionComplete += PrivateTransactionAgent_TransactionComplete;
+
+            DialogueId = Guid.NewGuid().ToString();
+            _responseHandler = new DefaultResponseHandler();
+            _initRequest = initRequestMethod; // Temporary solution, must be handled by "dialogue flow"
+
+            // TODO create default action with init request method
         }
 
-        public void AddNewDestiantionUris(IEnumerable<SipUri> destinationUris)
+        /// <summary>
+        ///     Starts the dialogue flow.
+        /// </summary>
+        public async Task StartDialogueFlow()
         {
-            foreach (SipUri destinationUri in destinationUris)
+            SipRequestMessage toSend = PrivateGetSipRequest(_initRequest);
+            await _transactionLayer.SendSipRequestAsync(toSend);
+        }
+
+        private SipRequestMessage PrivateGetSipRequest(string requestMethod)
+        {
+            SipRequestMessage request = new SipRequestMessage(requestMethod, RequestUri);
+            request.Headers.From = From;
+            request.Headers.To = To;
+            request.Headers.Contact = From.ToString();
+            request.Headers.CallId = DialogueId;
+
+            return request;
+        }
+
+        private void PrivateTransactionAgent_TransactionComplete(object sender, TransactionCompleteEventArgs e)
+        {
+            if (e.Transaction.FinalResponse.Headers.CallId == DialogueId)
             {
-                AddNewDestinationUri(destinationUri);
+                _responseHandler.ProcessSipMessage(e.Transaction.FinalResponse);
             }
-        }
-
-        private void TransactionAgent_TransactionComplete(object sender, TransactionCompleteEventArgs e)
-        {
-            ResponseHandler.ProcessSipMessage(e.Transaction.FinalResponse);
         }
 
         private int GetSeqNumber()
@@ -83,6 +108,16 @@ namespace SipClient.Models
             {
                 return _lastSeqNumber++;
             }
+        }
+
+        /// <summary>
+        ///     Dialogue processing state.
+        /// </summary>
+        public enum DialogueState
+        {
+            CREATED,
+            PROCESSING,
+            COMPLETE
         }
     }
 }
