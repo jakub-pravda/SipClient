@@ -1,5 +1,7 @@
-﻿using Javor.SipSerializer;
+﻿using SipClient.Logging;
+using Javor.SipSerializer;
 using Javor.SipSerializer.HeaderFields;
+using Javor.SipSerializer.Helpers;
 using Javor.SipSerializer.Schemes;
 using SipClient.Instances;
 using System;
@@ -19,6 +21,7 @@ namespace SipClient.Models
         private ISipTransactionLayer _transactionLayer;
         private ISipResponseHandler _responseHandler;
         private string _initRequest;
+        private readonly ILog _logger = LogProvider.GetCurrentClassLogger();
 
         /// <summary>
         ///     Unique dialogue identificator.
@@ -42,11 +45,17 @@ namespace SipClient.Models
         public Identification To { get; set; }
 
         /// <summary>
-        ///     Request uri.
+        ///     Sip request destination.
         /// </summary>
-        public SipUri RequestUri { get; private set; }
+        public SipUri DestinationUri { get; private set; }
+
+        private SipDialogue()
+        {
+            _logger.Debug("New dialogue created.");
+        }
 
         public SipDialogue(Action<ISipResponseHandler> sipResponseHandler)
+            : this()
         {
             throw new NotImplementedException();
         }
@@ -59,15 +68,16 @@ namespace SipClient.Models
         /// <param name="from"></param>
         /// <param name="transactionLayer"></param>
         public SipDialogue(string initRequestMethod, SipUri requestUri, Identification from, ISipTransactionLayer transactionLayer)
+            : this()
         {
             From = from;
             To = new Identification(from.Uri, null);
-            RequestUri = requestUri;
+            DestinationUri = requestUri;
             
             _transactionLayer = transactionLayer;
             _transactionLayer.TransactionComplete += PrivateTransactionAgent_TransactionComplete;
 
-            DialogueId = Guid.NewGuid().ToString();
+            DialogueId = DialogueHelpers.GenerateCallId();
             _responseHandler = new DefaultResponseHandler();
             _initRequest = initRequestMethod; // Temporary solution, must be handled by "dialogue flow"
 
@@ -79,13 +89,19 @@ namespace SipClient.Models
         /// </summary>
         public async Task StartDialogueFlow()
         {
+            _logger.Debug("Starting new dialogue flow.");
+
             SipRequestMessage toSend = PrivateGetSipRequest(_initRequest);
+
+            // create unique tag
+            toSend.Headers.From.Tag = DialogueHelpers.GenerateIdentificationTag();
+
             await _transactionLayer.SendSipRequestAsync(toSend);
         }
 
         private SipRequestMessage PrivateGetSipRequest(string requestMethod)
         {
-            SipRequestMessage request = new SipRequestMessage(requestMethod, RequestUri);
+            SipRequestMessage request = new SipRequestMessage(requestMethod, DestinationUri);
             request.Headers.From = From;
             request.Headers.To = To;
             request.Headers.Contact = From.ToString();

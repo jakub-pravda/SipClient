@@ -25,6 +25,12 @@ namespace SipClient.Extensions
             return builder;
         }
 
+        public static ISipBuilder SetRegistrarUri(this ISipBuilder builder, string registrarUri)
+        {
+            builder.RegistrarUri = new SipUri(registrarUri);
+            return builder;
+        }
+
         public static ISipBuilder SetRegistrarUri(this ISipBuilder builder, SipUri registrarUri)
         {
             builder.RegistrarUri = registrarUri;

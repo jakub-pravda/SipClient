@@ -11,7 +11,6 @@ namespace Javor.SipSerializer.Schemes
     {
         public SipUri()
         {
-            Port = 5060;
         }
 
         /// <summary>
@@ -19,7 +18,6 @@ namespace Javor.SipSerializer.Schemes
         /// </summary>
         /// <param name="host"></param>
         public SipUri(string host, string user)
-            : this()
         {
             if (host == null) throw new ArgumentNullException("Invalid sip uri host.");
             if (string.IsNullOrEmpty(user)) throw new ArgumentNullException("Invalid sip uri user.");
@@ -66,7 +64,7 @@ namespace Javor.SipSerializer.Schemes
         /// <summary>
         ///     URI IPAddress port
         /// </summary>
-        public int Port { get; set; }
+        public int Port { get; set; } = 5060;
 
         /// <summary>
         ///     URI string representation

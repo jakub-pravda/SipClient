@@ -14,11 +14,16 @@ namespace Javor.SipSerializer
         ///     Request method.
         /// </summary>
         public string Method;
-        
+
         /// <summary>
-        ///     Request uri.
+        ///     Remote host identification.
         /// </summary>
-        public SipUri Uri;
+        public string Host;
+
+        /// <summary>
+        ///     Sip scheme identification.
+        /// </summary>
+        public string Scheme;
 
         /// <summary>
         ///     Sip version.
@@ -34,8 +39,9 @@ namespace Javor.SipSerializer
         public RequestLine(string method, SipUri uri, string version)
         {
             Method = method;
-            Uri = uri;
             Version = version;
+            Host = uri.Host;
+            Scheme = uri.Scheme;
         }
 
         /// <summary>
@@ -44,7 +50,7 @@ namespace Javor.SipSerializer
         /// <returns></returns>
         public override string ToString()
         {
-            return $"{Method} {Uri} {Version} {ABNF.CRLF}";
+            return $"{Method} {Scheme}:{Host} {Version}{ABNF.CRLF}";
         }
     }
 

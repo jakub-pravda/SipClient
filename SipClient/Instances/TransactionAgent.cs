@@ -81,8 +81,10 @@ namespace SipClient.Instances
 
             SetNewTransaction(request);
 
-            _logger.Debug(string.Format("Sending SIP message {0} to {1}", request.ToString(), SipUri.ToString()));
-            bool sendResult = await SendData(Encoding.ASCII.GetBytes(request.ToString()), SipUri.Host, SipUri.Port); // only ip address is valid at this time
+            string strRequest = request.ToString();
+
+            _logger.Debug(string.Format("Sending SIP message\n{0}", strRequest));
+            bool sendResult = await SendData(Encoding.ASCII.GetBytes(strRequest), SipUri.Host, SipUri.Port); // only ip address is valid at this time
 
             return sendResult;
         }
