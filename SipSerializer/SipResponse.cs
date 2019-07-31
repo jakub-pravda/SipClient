@@ -7,13 +7,13 @@ namespace Javor.SipSerializer
     /// <summary>
     ///     SIP Response message model
     /// </summary>
-    public class SipResponseMessage : SipMessage
+    public class SipResponse : SipMessage
     {
         /// <summary>
         ///     Initialize new SIP response message.
         /// </summary>
         /// <param name="statusLine">Status line.</param>
-        public SipResponseMessage(string statusLine)
+        public SipResponse(string statusLine)
         {
             StatusLine = new StatusLine(statusLine);
             Type = SipMessageType.Response;
@@ -23,7 +23,7 @@ namespace Javor.SipSerializer
         ///     Initialize new SIP response message.
         /// </summary>
         /// <param name="statusLine">Status line.</param>
-        public SipResponseMessage(StatusLine statusLine)
+        public SipResponse(StatusLine statusLine)
         {
             StatusLine = statusLine;
         }
@@ -32,7 +32,7 @@ namespace Javor.SipSerializer
 
         #region Statics
 
-        public static SipResponseMessage CreateSipResponse(string SipMessage)
+        public static SipResponse CreateSipResponse(string SipMessage)
         {
             // separate message into the pieces (headers, bodies, ...)
             string[] messageParts
@@ -42,7 +42,7 @@ namespace Javor.SipSerializer
             string[] statLineAndHeaders
                 = messageParts[0].Split(new string[] { ABNF.CRLF }, 2, StringSplitOptions.None);
 
-            SipResponseMessage sipResponse = new SipResponseMessage(statLineAndHeaders[0]);
+            SipResponse sipResponse = new SipResponse(statLineAndHeaders[0]);
             sipResponse.AddHeaders(statLineAndHeaders[1]);
 
             return sipResponse;

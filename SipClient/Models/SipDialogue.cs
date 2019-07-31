@@ -91,7 +91,7 @@ namespace SipClient.Models
         {
             _logger.Debug("Starting new dialogue flow.");
 
-            SipRequestMessage toSend = PrivateGetSipRequest(_initRequest);
+            SipRequest toSend = PrivateGetSipRequest(_initRequest);
 
             // create unique tag
             toSend.Headers.From.Tag = DialogueHelpers.GenerateIdentificationTag();
@@ -99,9 +99,9 @@ namespace SipClient.Models
             await _transactionLayer.SendSipRequestAsync(toSend);
         }
 
-        private SipRequestMessage PrivateGetSipRequest(string requestMethod)
+        private SipRequest PrivateGetSipRequest(string requestMethod)
         {
-            SipRequestMessage request = new SipRequestMessage(requestMethod, DestinationUri);
+            SipRequest request = new SipRequest(requestMethod, DestinationUri);
             request.Headers.From = From;
             request.Headers.To = To;
             request.Headers.Contact = From.ToString();

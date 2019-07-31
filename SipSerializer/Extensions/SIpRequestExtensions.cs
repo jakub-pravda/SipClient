@@ -12,10 +12,10 @@ namespace Javor.SipSerializer.Extensions
         /// <param name="sipRequest">SIP request from which SIP response will be created.</param>
         /// <param name="statusCode">SIP response status code.</param>
         /// <returns>SIP response message.</returns>
-        public static SipResponseMessage CreateResponse(this SipRequestMessage sipRequest, StatusCode statusCode)
+        public static SipResponse CreateResponse(this SipRequest sipRequest, StatusCode statusCode)
         {
             StatusLine sl = new StatusLine(statusCode);
-            SipResponseMessage response = new SipResponseMessage(sl);
+            SipResponse response = new SipResponse(sl);
 
             // required response headers
             response.Headers.From = sipRequest.Headers.From;

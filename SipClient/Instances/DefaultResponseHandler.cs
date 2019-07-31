@@ -8,7 +8,7 @@ namespace SipClient.Instances
     {
         private readonly ILog _logger = LogProvider.GetCurrentClassLogger();
 
-        public bool ProcessSipMessage(SipResponseMessage sipResponse)
+        public bool ProcessSipMessage(SipResponse sipResponse)
         {
             switch(sipResponse.StatusLine.StatusCode)
             {

@@ -21,23 +21,23 @@ namespace SipClient.Models
         /// <summary>
         ///     Provisional response list (1xx responses).
         /// </summary>
-        public List<SipResponseMessage> ProvisionalResponses { get; } = new List<SipResponseMessage>(4);
+        public List<SipResponse> ProvisionalResponses { get; } = new List<SipResponse>(4);
 
         /// <summary>
         ///     Initial transaction request.
         /// </summary>
-        public SipRequestMessage InitialRequest { get; }
+        public SipRequest InitialRequest { get; }
 
         /// <summary>
         ///     Final response message (non 1xx message).
         /// </summary>
-        public SipResponseMessage FinalResponse { get; private set; }
+        public SipResponse FinalResponse { get; private set; }
 
         /// <summary>
         ///     Initialize new transaction.
         /// </summary>
         /// <param name="transactionId">Transaction id.</param>
-        public Transaction(SipRequestMessage initialRequest)
+        public Transaction(SipRequest initialRequest)
         {
             if (initialRequest == null) throw new ArgumentNullException("Invalid initial SIP request message.");
 
@@ -48,7 +48,7 @@ namespace SipClient.Models
             Status = TransactionStatus.INIT;
         }
 
-        public bool SetResponse(SipResponseMessage sipResponse)
+        public bool SetResponse(SipResponse sipResponse)
         {
             if (sipResponse.StatusLine.StatusCode.StartsWith("1"))
             {

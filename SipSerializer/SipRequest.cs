@@ -13,34 +13,34 @@ namespace Javor.SipSerializer
     /// <summary>
     ///     Sip request message.
     /// </summary>
-    public class SipRequestMessage : SipMessage
+    public class SipRequest : SipMessage
     {
         /// <summary>
         ///     Request line.
         /// </summary>
         public RequestLine RequestLine { get; private set; }
 
-        private SipRequestMessage()
+        private SipRequest()
             : base()
         {
             Type = SipMessageType.Request;
         }
 
-        public SipRequestMessage(string requestType, SipUri uri, int cSeq = 0)
+        public SipRequest(string requestType, SipUri uri, int cSeq = 0)
             : this()
         {
             RequestLine = new RequestLine(requestType, uri, Constants.SipVersion);
             Headers.CSeq = new CSeq(cSeq, RequestLine.Method);
         }
 
-        public SipRequestMessage(string requestType, string uri, int cSeq = 0)
+        public SipRequest(string requestType, string uri, int cSeq = 0)
             : this()
         {
             RequestLine = new RequestLine(requestType, new SipUri(uri), Constants.SipVersion);
             Headers.CSeq = new CSeq(cSeq, RequestLine.Method);
         }
 
-        public SipRequestMessage(RequestLine requestLine, int cSeq = 0)
+        public SipRequest(RequestLine requestLine, int cSeq = 0)
             : this()
         {
             RequestLine = requestLine;

@@ -7,6 +7,6 @@ namespace SipClient.Models
     /// </summary>
     public interface ISipResponseHandler
     {
-        bool ProcessSipMessage(SipResponseMessage sipResponse);
+        bool ProcessSipMessage(SipResponse sipResponse);
     }
 }

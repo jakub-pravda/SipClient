@@ -74,7 +74,7 @@ namespace SipClient.Instances
         /// <param name="destinationPort">User agent server port.</param>
         /// <param name="waitForResponse"></param>
         /// <returns></returns>
-        public async Task<bool> SendSipRequestAsync(SipRequestMessage request, bool waitForResponse = false)
+        public async Task<bool> SendSipRequestAsync(SipRequest request, bool waitForResponse = false)
         {
             if (request == null) throw new ArgumentNullException("Request message cann't be null.");
 
@@ -144,7 +144,7 @@ namespace SipClient.Instances
             }
         }
 
-        private void SetNewTransaction(SipRequestMessage initialRequest)
+        private void SetNewTransaction(SipRequest initialRequest)
         {
             if (_via == null) throw new ArgumentNullException("VIA SIP header cann't be empty. Listening agent was not properly started.");
 
@@ -218,7 +218,7 @@ namespace SipClient.Instances
             }
             else if (messageType == SipMessageType.Response)
             {
-                sipMessage = SipResponseMessage.CreateSipResponse(recvMsg);
+                sipMessage = SipResponse.CreateSipResponse(recvMsg);
             }
             else
             {
@@ -237,7 +237,7 @@ namespace SipClient.Instances
                     throw new NotImplementedException($"Cann't find transaction with transaction id {transactionInfo.Branch}.");
                 }
 
-                if (transaction.SetResponse((SipResponseMessage)sipMessage))
+                if (transaction.SetResponse((SipResponse)sipMessage))
                 {
                     _logger.Info($"Transacion {transactionInfo.Branch} complete.");
                     OnTransactionComplete(transaction);

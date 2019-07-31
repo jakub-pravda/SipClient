@@ -28,7 +28,7 @@ namespace SipClient.Instances
         /// <param name="destinationPort">User agent server port.</param>
         /// <param name="waitForResponse"></param>
         /// <returns></returns>
-        Task<bool> SendSipRequestAsync(SipRequestMessage request, bool waitForResponse = false);
+        Task<bool> SendSipRequestAsync(SipRequest request, bool waitForResponse = false);
 
         /// <summary>
         ///     Start with listening on the designated ip address:port
