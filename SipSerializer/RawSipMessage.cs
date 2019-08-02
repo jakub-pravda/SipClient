@@ -13,14 +13,14 @@ namespace Javor.SipSerializer
             SipMessage = sipMessage;
         }
 
-        public string GetHeaderValue(string headerName)
+        public string GetHeaderValue(string headerName, StringComparison comparisonType = StringComparison.CurrentCultureIgnoreCase)
         {
-            return FindHeaderValue(SipMessage.AsSpan(), headerName).ToString();
+            return FindHeaderValue(SipMessage.AsSpan(), headerName, comparisonType).ToString();
         }
 
-        private ReadOnlySpan<char> FindHeaderValue(ReadOnlySpan<char> sipMessage, string headerName)
+        private ReadOnlySpan<char> FindHeaderValue(ReadOnlySpan<char> sipMessage, string headerName, StringComparison comparisonType)
         {
-            int headerIndex = sipMessage.IndexOf(headerName.AsSpan());
+            int headerIndex = sipMessage.IndexOf(headerName.AsSpan(), comparisonType);
 
             if (headerIndex < 0)
                 return null;
