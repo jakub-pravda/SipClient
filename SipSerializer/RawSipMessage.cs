@@ -1,9 +1,13 @@
-﻿using System;
+﻿using Javor.SipSerializer;
+using System;
 
 namespace Javor.SipSerializer
 {
     public class RawSipMessage
     {
+        /// <summary>
+        ///     Original sip message
+        /// </summary>
         public string SipMessage { get; private set; }
 
         public RawSipMessage(string sipMessage)
@@ -16,6 +20,27 @@ namespace Javor.SipSerializer
         public string GetHeaderValue(string headerName, StringComparison comparisonType = StringComparison.CurrentCultureIgnoreCase)
         {
             return FindHeaderValue(SipMessage.AsSpan(), headerName, comparisonType).ToString();
+        }
+
+        /// <summary>
+        ///     Get sip message type
+        /// </summary>
+        /// <returns></returns>
+        public SipMessage.SipMessageType GetMessageType()
+        {
+            ReadOnlySpan<char> sipMessage = SipMessage.AsSpan();
+            ReadOnlySpan<char> statusLine = sipMessage.Slice(0, sipMessage.IndexOf(ABNF.CRLF.AsSpan()));
+
+            if (statusLine.EndsWith(Constants.SipVersion.AsSpan()))
+            {
+                return SipSerializer.SipMessage.SipMessageType.Request;
+            }
+            else if (statusLine.StartsWith(Constants.SipVersion.AsSpan()))
+            {
+                return SipSerializer.SipMessage.SipMessageType.Response;
+            }
+
+            return SipSerializer.SipMessage.SipMessageType.Unknown;
         }
 
         private ReadOnlySpan<char> FindHeaderValue(ReadOnlySpan<char> sipMessage, string headerName, StringComparison comparisonType)

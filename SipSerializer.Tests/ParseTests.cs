@@ -92,6 +92,20 @@ namespace Javor.SipSerializer.Tests
         }
 
         [Theory]
+        [ClassData(typeof(SipMessageTypeTestData))]
+        public void Get_Raw_Sip_Message_Type_Success(string sipMessage, SipMessage.SipMessageType messageTypeExpected)
+        {
+            // *** ARRANGE ***
+            RawSipMessage rawMessage = new RawSipMessage(sipMessage);
+
+            // *** ACT ***
+            SipMessage.SipMessageType messageTypeResult = rawMessage.GetMessageType();
+
+            // *** ASSERT ***
+            Assert.Equal(messageTypeExpected, messageTypeResult);
+        }
+
+        [Theory]
         [MemberData(nameof(TestCases.TestData_SipResponses), MemberType = typeof(TestCases))]
         public void Deserialize_Sip_Response_Success(string sipResponse)
         {

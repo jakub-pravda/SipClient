@@ -11,6 +11,26 @@ namespace Javor.SipSerializer
         private RawSipMessage _sipMessage;
 
         /// <summary>
+        ///     Sip message type
+        /// </summary>
+        public SipMessage.SipMessageType SipType 
+        { 
+            get
+            {
+                if (_sipType == SipMessage.SipMessageType.Unknown)
+                {
+                    _sipType = _sipMessage.GetMessageType();
+                }
+                return _sipType;
+            } 
+            private set
+            {
+                _sipType = value;
+            }
+        }
+        private SipMessage.SipMessageType _sipType = SipMessage.SipMessageType.Unknown;
+
+        /// <summary>
         ///     Instantiate new lazy SIP message
         /// </summary>
         /// <param name="sipMessage">Sip message</param>
