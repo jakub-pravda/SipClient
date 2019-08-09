@@ -15,7 +15,7 @@ namespace Javor.SipSerializer.Helpers
         /// </summary>
         /// <param name="sipMessage">Raw sip message.</param>
         /// <returns>Sip message type.</returns>
-        public static SipMessage.SipMessageType GetSipMessageType(string sipMessage)
+        public static SipMessageType GetSipMessageType(string sipMessage)
         {
             // TODO error handling
 
@@ -27,14 +27,14 @@ namespace Javor.SipSerializer.Helpers
             // check if init line is status or request line
             if (IsRequestLine(initLine, out string reqErr))
             {
-                return SipMessage.SipMessageType.Request;
+                return SipMessageType.Request;
             }
             else if (IsStatusLine(initLine, out string stErr))
             {
-                return SipMessage.SipMessageType.Response;
+                return SipMessageType.Response;
             }
 
-            return SipMessage.SipMessageType.Unknown;
+            return SipMessageType.Unknown;
         }
 
         /// <summary>

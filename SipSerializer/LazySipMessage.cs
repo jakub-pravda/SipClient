@@ -13,11 +13,11 @@ namespace Javor.SipSerializer
         /// <summary>
         ///     Sip message type
         /// </summary>
-        public SipMessage.SipMessageType SipType 
+        public SipMessageType SipType 
         { 
             get
             {
-                if (_sipType == SipMessage.SipMessageType.Unknown)
+                if (_sipType == SipMessageType.Unknown)
                 {
                     _sipType = _sipMessage.GetMessageType();
                 }
@@ -28,7 +28,7 @@ namespace Javor.SipSerializer
                 _sipType = value;
             }
         }
-        private SipMessage.SipMessageType _sipType = SipMessage.SipMessageType.Unknown;
+        private SipMessageType _sipType = SipMessageType.Unknown;
 
         /// <summary>
         ///     Instantiate new lazy SIP message

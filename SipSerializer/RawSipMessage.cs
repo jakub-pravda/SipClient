@@ -26,21 +26,21 @@ namespace Javor.SipSerializer
         ///     Get sip message type
         /// </summary>
         /// <returns></returns>
-        public SipMessage.SipMessageType GetMessageType()
+        public SipMessageType GetMessageType()
         {
             ReadOnlySpan<char> sipMessage = SipMessage.AsSpan();
             ReadOnlySpan<char> statusLine = sipMessage.Slice(0, sipMessage.IndexOf(ABNF.CRLF.AsSpan()));
 
             if (statusLine.EndsWith(Constants.SipVersion.AsSpan()))
             {
-                return SipSerializer.SipMessage.SipMessageType.Request;
+                return SipSerializer.SipMessageType.Request;
             }
             else if (statusLine.StartsWith(Constants.SipVersion.AsSpan()))
             {
-                return SipSerializer.SipMessage.SipMessageType.Response;
+                return SipSerializer.SipMessageType.Response;
             }
 
-            return SipSerializer.SipMessage.SipMessageType.Unknown;
+            return SipSerializer.SipMessageType.Unknown;
         }
 
         private ReadOnlySpan<char> FindHeaderValue(ReadOnlySpan<char> sipMessage, string headerName, StringComparison comparisonType)
