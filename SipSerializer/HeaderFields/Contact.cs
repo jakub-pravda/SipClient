@@ -9,27 +9,8 @@ namespace Javor.SipSerializer.HeaderFields
     ///     A "Contact" header field value provides URI whose meaning depends on the type of request 
     ///     or response it is in
     /// </summary> 
-    public class Contact : SipHeader
-    {
-        /// <summary>
-        ///     Initialize new contact header.
-        /// </summary>
-        public Contact()
-            : base()
-        {
-                
-        }
-
-        /// <summary>
-        ///     Initialize new contact header.
-        /// </summary>
-        /// <param name="contactHeader">Contact header content.</param>
-        public Contact(string contactHeader)
-            : base(contactHeader)
-        {
-            
-        }
-        
+    public class Contact
+    {        
         public SipUri URI { get; set; }
         public string DisplayName { get; set; }
 

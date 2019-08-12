@@ -1,160 +1,76 @@
+﻿using Javor.SipSerializer;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Reflection;
-using System.Text;
-using System.Threading;
-using Javor.SipSerializer;
-using Javor.SipSerializer.Attributes;
-using Javor.SipSerializer.Bodies;
-using Javor.SipSerializer.Exceptions;
-using Javor.SipSerializer.HeaderFields;
 
 namespace Javor.SipSerializer
 {
-    // TODO create compact form
-    // TODO supported and require header
-    /// <summary>
-    ///     Base SIP message model.
-    /// </summary>
-    public abstract class SipMessage
+    public class SipMessage
     {
         /// <summary>
-        ///     Sip message unique id.
+        ///     Original sip message
         /// </summary>
-        public string Id
+        public string Raw { get; private set; }
+
+        public SipMessage(string sipMessage)
         {
-            get
-            {
-                return Headers.CallId;
-            }
+            if (string.IsNullOrEmpty(sipMessage)) throw new ArgumentNullException("Cannt be null or empty");
+
+            Raw = sipMessage;
+        }
+
+        public string GetHeaderValue(string headerName, StringComparison comparisonType = StringComparison.CurrentCultureIgnoreCase)
+        {
+            return FindHeaderValue(Raw.AsSpan(), headerName, comparisonType).ToString();
         }
 
         /// <summary>
-        ///     Sip message headers.
+        ///     Get sip message type
         /// </summary>
-        public StandardHeaders Headers { get; set; }
-            = new StandardHeaders();
-
-        /// <summary>
-        ///     Sip message bodies.
-        /// </summary>
-        public ICollection<ISipBody> Bodies { get; set; }
-
-        /// <summary>
-        ///     Sip message type.
-        /// </summary>
-        public SipMessageType Type { get; protected set; }
-
-        /// <summary>
-        ///     Checks if sip message is valid.
-        ///      Returns relevant validity code.
-        /// </summary>
-        public SipMessageValidityCode IsValid
+        /// <returns></returns>
+        public SipMessageType GetMessageType()
         {
-            get
+            ReadOnlySpan<char> sipMessage = Raw.AsSpan();
+            ReadOnlySpan<char> statusLine = sipMessage.Slice(0, sipMessage.IndexOf(ABNF.CRLF.AsSpan()));
+
+            if (statusLine.EndsWith(Constants.SipVersion.AsSpan()))
             {
-                return CheckValidity();
+                return SipSerializer.SipMessageType.Request;
             }
+            else if (statusLine.StartsWith(Constants.SipVersion.AsSpan()))
+            {
+                return SipSerializer.SipMessageType.Response;
+            }
+
+            return SipSerializer.SipMessageType.Unknown;
         }
 
-        /// <summary>
-        ///     Ass new sip headers to the sip message.
-        /// </summary>
-        /// <param name="headerLines">Full header lines in a raw form.</param>
-        public void AddHeaders(string headerLines)
+        private ReadOnlySpan<char> FindHeaderValue(ReadOnlySpan<char> sipMessage, string headerName, StringComparison comparisonType)
         {
-            string[] headers
-                = headerLines.Split(new string[] { ABNF.CRLF }, StringSplitOptions.None);
+            int headerIndex = sipMessage.IndexOf(headerName.AsSpan(), comparisonType);
 
-            AddHeaders(headers);
-        }
+            if (headerIndex < 0)
+                return null;
 
-        /// <summary>
-        ///     Add new sip headers to the sip message.
-        /// </summary>
-        /// <param name="headers">Full header lines.</param>
-        public void AddHeaders(string[] headerLines)
-        {
-            foreach (string header in headerLines)
+            int delimiterPosition = -1;
+            bool delimiterFound = false;
+            int endOfTheLinePosition = -1;
+            for (int i = headerIndex; i < sipMessage.Length; i++)
             {
-                AddHeader(header);
-            }
-        }
-
-        /// <summary>
-        ///     Add new sip header to the message.
-        /// </summary>
-        /// <param name="headerLine">Full header line.</param>
-        public void AddHeader(string headerLine)
-        {
-            if (string.IsNullOrEmpty(headerLine))
-                throw new ArgumentNullException("Header line cann't be null.");
-
-            string[] header = headerLine.Split(new[] { ABNF.HCOLON }, 2, StringSplitOptions.None);
-            if (header.Length == 2) // header name, header content
-            {
-                AddHeader(header[0], header[1]);
-            }
-            else
-            {
-                throw new SipParsingException($"Invalid header line: {headerLine}.");
-            }
-        }
-
-        /// <summary>
-        ///     Add new sip header to the message.
-        /// </summary>
-        /// <param name="headerName">Header name.</param>
-        /// <param name="headerContent">Header content.</param>
-        public void AddHeader(string headerName, string headerContent)
-        {
-            if (string.IsNullOrEmpty(headerName))
-                throw new ArgumentNullException("Header name cann't be null.");
-            if (string.IsNullOrEmpty(headerContent))
-                throw new ArgumentNullException("Header content cann't be null.");
-
-            PropertyInfo[] properties = typeof(StandardHeaders)
-                .GetProperties(BindingFlags.Public | BindingFlags.Instance);
-
-            foreach (PropertyInfo property in properties)
-            {
-                HeaderNameAttribute propertyAttribute =
-                    (HeaderNameAttribute)property.GetCustomAttribute(typeof(HeaderNameAttribute));
-
-                if (string.Equals(headerName, propertyAttribute?.GetHeaderFullName(),
-                        StringComparison.InvariantCultureIgnoreCase)
-                    || string.Equals(headerName, propertyAttribute?.GetHeaderCompactFormName(),
-                        StringComparison.InvariantCultureIgnoreCase))
+                // find delimiter
+                if (!delimiterFound && sipMessage[i] == ':')
                 {
-                    property.SetValue(Headers, headerContent, BindingFlags.Default, new SipBinder(), null, null);
+                    delimiterPosition = i;
+                    delimiterFound = true;
+                }
+
+                // find end of the line
+                if (sipMessage[i] == '\r' && sipMessage[i + 1] == '\n')
+                {
+                    endOfTheLinePosition = i - 1;
                     break;
                 }
             }
-        }
 
-        private SipMessageValidityCode CheckValidity()
-        {
-            if (Headers.ContentLength > 0)
-            {
-                // TODO check content length validity
-                // check if sip message contains whole content
-            }
-
-            return SipMessageValidityCode.Valid;
-        }
-
-        /// <summary>
-        ///     Convert SIP message into the string.
-        /// </summary>
-        /// <returns>String representation of the SIP message.</returns>
-        public override string ToString()
-        {
-            StringBuilder sb = new StringBuilder();
-            sb.Append(Headers.ToString());
-            sb.Append(ABNF.CRLF);
-
-            return sb.ToString();
+            return sipMessage.Slice(delimiterPosition + 1, endOfTheLinePosition - delimiterPosition);
         }
     }
 }

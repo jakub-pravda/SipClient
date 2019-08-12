@@ -11,21 +11,26 @@ using System.Text;
 namespace Javor.SipSerializer
 {
     /// <summary>
-    ///     Sip request message.
+    ///     Sip request message
     /// </summary>
-    public class SipRequest : SipMessage
+    public class SipRequest : BaseSip
     {
         /// <summary>
-        ///     Request line.
+        ///     Request line
         /// </summary>
         public RequestLine RequestLine { get; private set; }
 
         private SipRequest()
-            : base()
         {
             Type = SipMessageType.Request;
         }
 
+        /// <summary>
+        ///     Initialize new sip request
+        /// </summary>
+        /// <param name="requestType">Request type</param>
+        /// <param name="uri">Sip uri</param>
+        /// <param name="cSeq">Cseq number</param>
         public SipRequest(string requestType, SipUri uri, int cSeq = 0)
             : this()
         {
@@ -33,6 +38,12 @@ namespace Javor.SipSerializer
             Headers.CSeq = new CSeq(cSeq, RequestLine.Method);
         }
 
+        /// <summary>
+        ///     Initialize new sip request
+        /// </summary>
+        /// <param name="requestType">Request type</param>
+        /// <param name="uri">Sip uri</param>
+        /// <param name="cSeq">Cseq number</param>
         public SipRequest(string requestType, string uri, int cSeq = 0)
             : this()
         {
@@ -40,27 +51,16 @@ namespace Javor.SipSerializer
             Headers.CSeq = new CSeq(cSeq, RequestLine.Method);
         }
 
+        /// <summary>
+        ///     Initialize new sip request
+        /// </summary>
+        /// <param name="requestLine">Request line</param>
+        /// <param name="cSeq">CSeq number</param>
         public SipRequest(RequestLine requestLine, int cSeq = 0)
             : this()
         {
             RequestLine = requestLine;
             Headers.CSeq = new CSeq(cSeq, RequestLine.Method);
-        }
-
-        /// <summary>
-        ///     Deserialize and set request line.
-        /// </summary>
-        /// <param name="requestLine">Request line in string form.</param>
-        public void DeserializeAndSetRequestLine(string requestLine)
-        {
-            var parsed = requestLine.Trim().Split(ABNF.SP);
-
-            if (!ParsingHelpers.IsRequestLine(parsed, out string err))
-            {
-                throw new SipParsingException(err);
-            }
-            
-            RequestLine = new RequestLine(parsed[0], new SipUri(parsed[1]), Constants.SipVersion);
         }
 
         /// <summary>

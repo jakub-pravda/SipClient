@@ -2,43 +2,43 @@ namespace Javor.SipSerializer.HeaderFields
 {
     public static class HeaderFieldsNames
     {
-        public const string Contact = "Contact";
+        public const string Contact = "CONTACT";
         public const string ContactCompactForm = "m";
 
-        public const string From = "From";
+        public const string From = "FROM";
         
-        public const string To = "To";
+        public const string To = "TO";
         
-        public const string Cseq = "CSeq";
+        public const string Cseq = "CSEQ";
         
-        public const string CallId = "Call-ID";
+        public const string CallId = "CALL-ID";
         
-        public const string Allow = "Allow";
+        public const string Allow = "ALLOW";
         
-        public const string Supported = "Supported";
+        public const string Supported = "SUPPORTED";
         
-        public const string Unsupported = "Unsupported";
+        public const string Unsupported = "UNSUPPORTED";
         
-        public const string MaxForwards = "Max-Forwards";
+        public const string MaxForwards = "MAX-FORWARDS";
         
-        public const string Via = "Via";
+        public const string Via = "VIA";
         
-        public const string AcceptLanguage = "Accept-Language";
+        public const string AcceptLanguage = "ACCEPT-LANGUAGE";
         
-        public const string AlertInfo = "Alert-Info";
+        public const string AlertInfo = "ALERT-INFO";
         
-        public const string SessionExpires = "Session-Expires";
+        public const string SessionExpires = "SESSION-EXPIRES";
         
-        public const string MinSe = "Min-SE";
+        public const string MinSe = "MIN-SE";
         
-        public const string ContentType = "Content-Type";
+        public const string ContentType = "CONTENT-TYPE";
         
-        public const string UserToUser = "User-To-User";
+        public const string UserToUser = "USER-TO-USER";
         
-        public const string MaxBreadth = "Max-Breadth";
+        public const string MaxBreadth = "MAX-BREADTH";
         
-        public const string ContentLength = "Content-Length";
+        public const string ContentLength = "CONTENT-LENGTH";
         
-        public const string Require = "Require";
+        public const string Require = "REQUIRE";
     }
 }

@@ -8,7 +8,7 @@ namespace Javor.SipSerializer
     /// </summary>
     public class LazySipMessage
     {
-        private RawSipMessage _sipMessage;
+        private SipMessage _sipMessage;
 
         /// <summary>
         ///     Sip message type
@@ -38,7 +38,7 @@ namespace Javor.SipSerializer
         {
             if (string.IsNullOrEmpty(sipMessage)) throw new ArgumentNullException("Sip message cann`t be null");
 
-            _sipMessage = new RawSipMessage(sipMessage);
+            _sipMessage = new SipMessage(sipMessage);
         }
 
         // Standard headers

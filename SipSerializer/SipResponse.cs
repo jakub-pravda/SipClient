@@ -5,14 +5,19 @@ using System.Text;
 namespace Javor.SipSerializer
 {
     /// <summary>
-    ///     SIP Response message model
+    ///     Sip response message
     /// </summary>
-    public class SipResponse : SipMessage
+    public class SipResponse : BaseSip
     {
         /// <summary>
-        ///     Initialize new SIP response message.
+        ///     Status line
         /// </summary>
-        /// <param name="statusLine">Status line.</param>
+        public StatusLine StatusLine { get; private set; }
+
+        /// <summary>
+        ///     Initialize new SIP response message
+        /// </summary>
+        /// <param name="statusLine">Status line</param>
         public SipResponse(string statusLine)
         {
             StatusLine = new StatusLine(statusLine);
@@ -20,38 +25,17 @@ namespace Javor.SipSerializer
         }
 
         /// <summary>
-        ///     Initialize new SIP response message.
+        ///     Initialize new SIP response message
         /// </summary>
-        /// <param name="statusLine">Status line.</param>
+        /// <param name="statusLine">Status line</param>
         public SipResponse(StatusLine statusLine)
         {
             StatusLine = statusLine;
         }
 
-        public StatusLine StatusLine { get; }
-
-        #region Statics
-
-        public static SipResponse CreateSipResponse(string SipMessage)
-        {
-            // separate message into the pieces (headers, bodies, ...)
-            string[] messageParts
-                = SipMessage.Split(new string[] { ABNF.CRLF + ABNF.CRLF }, StringSplitOptions.None);
-
-            // get request line + headers
-            string[] statLineAndHeaders
-                = messageParts[0].Split(new string[] { ABNF.CRLF }, 2, StringSplitOptions.None);
-
-            SipResponse sipResponse = new SipResponse(statLineAndHeaders[0]);
-            sipResponse.AddHeaders(statLineAndHeaders[1]);
-
-            return sipResponse;
-        }
-
-        #endregion
 
         /// <summary>
-        ///     Convert SIP response message into the string.
+        ///     Convert SIP response message into the string
         /// </summary>
         /// <returns></returns>
         public override string ToString()

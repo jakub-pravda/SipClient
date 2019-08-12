@@ -12,47 +12,41 @@ namespace Javor.SipSerializer.HeaderFields
     /// </summary>
     public class StandardHeaders
     {
-        // TODO compact forms
-
         [HeaderName(HeaderFieldsNames.From)]
-        public Identification From { get; set; }
+        public virtual Identification From { get; set; }
          
         [HeaderName(HeaderFieldsNames.To)]
-        public Identification To { get; set; }
+        public virtual Identification To { get; set; }
         
         [HeaderName(HeaderFieldsNames.CallId)]
-        public string CallId { get; set; }
+        public virtual string CallId { get; set; }
         
         [HeaderName(HeaderFieldsNames.MaxForwards)]
-        //public int MaxForwards { get; set; }
-        public string MaxForwards { get; set; }
+        public virtual string MaxForwards { get; set; }
 
         [HeaderName(HeaderFieldsNames.Via)]
-        public ICollection<Via> Via { get; set; }
-            = new List<Via>();
+        public virtual ICollection<Via> Via { get; set; }
         
         [HeaderName(HeaderFieldsNames.Cseq)]
-        public CSeq CSeq { get; set; }
+        public virtual CSeq CSeq { get; set; }
 
         [HeaderName(HeaderFieldsNames.Contact, HeaderFieldsNames.ContactCompactForm)]
-        //public IEnumerable<Contact> Contact { get; set; }
-        public string Contact { get; set; }
+        public virtual string Contact { get; set; }
         
         [HeaderName(HeaderFieldsNames.Require)]
-        public IEnumerable<string> Require { get; set; }
+        public virtual IEnumerable<string> Require { get; set; }
 
         [HeaderName(HeaderFieldsNames.Supported)]
-        //public IEnumerable<string> Supported { get; set; }
-        public string Supported { get; set; }
+        public virtual string Supported { get; set; }
         
         [HeaderName(HeaderFieldsNames.Unsupported)]
-        //public IEnumerable<string> Unsupported { get; set; }
-        public string Unsupported { get; set; }
+
+        public virtual string Unsupported { get; set; }
 
         [HeaderName(HeaderFieldsNames.ContentLength)]
-        public int ContentLength { get; set; }
+        public virtual int ContentLength { get; set; }
 
-        //public IEnumerable<string> UnknownHeaders { get; set; }
+        public virtual IDictionary<string, string> UnknownHeaders { get; set; }
         
         /// <summary>
         ///     Convert SIP headers into the string.

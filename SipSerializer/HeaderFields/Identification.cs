@@ -8,7 +8,7 @@ namespace Javor.SipSerializer.HeaderFields
     /// <summary>
     ///     Identification (from / to) header field.
     /// </summary>
-    public class Identification : SipHeader
+    public class Identification
     {
         /// <summary>
         ///     Initialize new identification (from / to) header.
@@ -17,21 +17,10 @@ namespace Javor.SipSerializer.HeaderFields
         /// <param name="tag">Tag id.</param>
         /// <param name="displayName">Display name parameter.</param>
         public Identification(SipUri sipUri, string tag, string displayName = null)
-            : base()
         {
             Uri = sipUri ?? throw new ArgumentNullException("Invalid client URI.");
             DisplayName = displayName;
             Tag = tag;
-        }
-
-        /// <summary>
-        ///     Initialize new identification (from / to) header.
-        /// </summary>
-        /// <param name="identificationHeader">From header content.</param>
-        public Identification(string identificationHeader)
-            : base (identificationHeader)
-        {
-            
         }
         
         /// <summary>

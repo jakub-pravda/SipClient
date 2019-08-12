@@ -7,26 +7,8 @@ namespace Javor.SipSerializer.HeaderFields
     /// <summary>
     ///     "Via" header field
     /// </summary>
-    public class Via : SipHeader
+    public class Via 
     {
-        /// <summary>
-        ///     Initialize new Via header.
-        /// </summary>
-        public Via()
-        {
-        }
-
-        /// <summary>
-        ///     Initialize new Via header.
-        /// </summary>
-        /// <param name="viaHeader">Full via header in the ascii form.</param>
-        public Via(string viaHeader)
-            : base(viaHeader)
-        {
-            if (string.IsNullOrEmpty(viaHeader)) throw new ArgumentNullException("Invalid asii via header.");
-            ParseVia(viaHeader);
-        }
-
         /// <summary>
         ///     Initialize new Via header.
         /// </summary>
@@ -84,11 +66,6 @@ namespace Javor.SipSerializer.HeaderFields
         /// <returns></returns>
         public override string ToString()
         {
-            if (!string.IsNullOrEmpty(OriginalString))
-            {
-                return OriginalString;
-            }
-
             return $"{Version}/{TransportProtocol.ToString()} {IpAddress}:{Port.ToString()};branch={Branch}";
         }
 
