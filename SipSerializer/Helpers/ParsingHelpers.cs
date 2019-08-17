@@ -132,7 +132,7 @@ namespace Javor.SipSerializer.Helpers
             if (sipMessage[len - 3] != '\n') return false;
             if (sipMessage[len - 4] != '\r') return false;
 
-            string value = GetSipMessageHeaderValueOrDefault(HeaderFieldsNames.ContentLength, sipMessage);
+            string value = GetSipMessageHeaderValueOrDefault(HeaderName.ContentLength, sipMessage);
             if (value == null) return false;
 
             bool convResult = int.TryParse(value, out int convValue);

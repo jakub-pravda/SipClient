@@ -12,41 +12,39 @@ namespace Javor.SipSerializer.HeaderFields
     /// </summary>
     public class StandardHeaders
     {
-        [HeaderName(HeaderFieldsNames.From)]
+        [HeaderName(HeaderName.From)]
         public virtual Identification From { get; set; }
          
-        [HeaderName(HeaderFieldsNames.To)]
+        [HeaderName(HeaderName.To)]
         public virtual Identification To { get; set; }
         
-        [HeaderName(HeaderFieldsNames.CallId)]
+        [HeaderName(HeaderName.CallId)]
         public virtual string CallId { get; set; }
         
-        [HeaderName(HeaderFieldsNames.MaxForwards)]
+        [HeaderName(HeaderName.MaxForwards)]
         public virtual string MaxForwards { get; set; }
 
-        [HeaderName(HeaderFieldsNames.Via)]
+        [HeaderName(HeaderName.Via)]
         public virtual ICollection<Via> Via { get; set; }
         
-        [HeaderName(HeaderFieldsNames.Cseq)]
+        [HeaderName(HeaderName.Cseq)]
         public virtual CSeq CSeq { get; set; }
 
-        [HeaderName(HeaderFieldsNames.Contact, HeaderFieldsNames.ContactCompactForm)]
+        [HeaderName(HeaderName.Contact, HeaderName.ContactCompactForm)]
         public virtual string Contact { get; set; }
         
-        [HeaderName(HeaderFieldsNames.Require)]
+        [HeaderName(HeaderName.Require)]
         public virtual IEnumerable<string> Require { get; set; }
 
-        [HeaderName(HeaderFieldsNames.Supported)]
+        [HeaderName(HeaderName.Supported)]
         public virtual string Supported { get; set; }
         
-        [HeaderName(HeaderFieldsNames.Unsupported)]
+        [HeaderName(HeaderName.Unsupported)]
 
         public virtual string Unsupported { get; set; }
 
-        [HeaderName(HeaderFieldsNames.ContentLength)]
+        [HeaderName(HeaderName.ContentLength)]
         public virtual int ContentLength { get; set; }
-
-        public virtual IDictionary<string, string> UnknownHeaders { get; set; }
         
         /// <summary>
         ///     Convert SIP headers into the string.

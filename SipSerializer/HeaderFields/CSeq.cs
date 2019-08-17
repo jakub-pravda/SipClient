@@ -1,3 +1,6 @@
+using Javor.SipSerializer.Exceptions;
+using System;
+
 namespace Javor.SipSerializer.HeaderFields
 {
     /// <summary>
@@ -8,11 +11,11 @@ namespace Javor.SipSerializer.HeaderFields
         /// <summary>
         ///     CSeq method.
         /// </summary>
-        public string Method { get; set; }
+        public string Method { get; private set; }
         /// <summary>
         ///     CSeq sequence number.
         /// </summary>
-        public int SequenceNumber { get; set; }
+        public int SequenceNumber { get; private set; }
 
         /// <summary>
         ///     Initialize new CSeq structure.
@@ -32,6 +35,23 @@ namespace Javor.SipSerializer.HeaderFields
         public override string ToString()
         {
             return $"{SequenceNumber} {Method}";
+        }
+
+        /// <summary>
+        ///     Create new cseq from raw cseq value
+        /// </summary>
+        /// <param name="s">Raw cseq value</param>
+        /// <returns>New cseq</returns>
+        public static CSeq Parse(string s)
+        {
+            if (s == null) return null;
+
+            string[] splitted = s.Split( new char[] {' '}, 2);
+
+            if (splitted.Length != 2)
+                throw new SipParsingException($"Invalid cseq line: {s}");
+
+            return new CSeq(int.Parse(splitted[0]), splitted[1]);
         }
     }
 }

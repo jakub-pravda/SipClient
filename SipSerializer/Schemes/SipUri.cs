@@ -9,37 +9,19 @@ namespace Javor.SipSerializer.Schemes
     /// </summary>
     public class SipUri
     {
-        public SipUri()
-        {
-        }
-
         /// <summary>
-        ///     Initialize new sip uri.
+        ///     Initialize new sip uri
         /// </summary>
         /// <param name="host"></param>
-        public SipUri(string host, string user)
+        public SipUri(string host, string user, string scheme = SipsScheme, int port = 5060)
         {
-            if (host == null) throw new ArgumentNullException("Invalid sip uri host.");
+            if (string.IsNullOrEmpty(host)) throw new ArgumentNullException("Invalid sip uri host.");
             if (string.IsNullOrEmpty(user)) throw new ArgumentNullException("Invalid sip uri user.");
 
             Host = host;
             User = user;
-        }
-
-        /// <summary>
-        ///     Initialize new sip uri.
-        /// </summary>
-        /// <param name="host"></param>
-        /// <param name="port"></param>
-        public SipUri(string host, int port, string user)
-            : this(host, user)
-        {
             Port = port;
-        }
-
-        public SipUri(string sipUri)
-        {
-            PrivateDeserializeSipuri(sipUri);
+            Scheme = scheme;
         }
 
         public const string SipScheme = "sip";
@@ -48,23 +30,23 @@ namespace Javor.SipSerializer.Schemes
         /// <summary>
         ///     SIP scheme
         /// </summary>
-        public string Scheme { get; set; }
+        public string Scheme { get; private set; }
             = SipScheme;
 
         /// <summary>
         ///     User name (eg. extension, name, etc.)
         /// </summary>
-        public string User { get; set; }
+        public string User { get; private set; }
 
         /// <summary>
         ///     Sip host. Should be both, domain or ip address.
         /// </summary>
-        public string Host { get; set; }
+        public string Host { get; private set; }
 
         /// <summary>
         ///     URI IPAddress port
         /// </summary>
-        public int Port { get; set; } = 5060;
+        public int Port { get; private set; }
 
         /// <summary>
         ///     URI string representation
@@ -89,17 +71,20 @@ namespace Javor.SipSerializer.Schemes
             return sb.ToString();
         }
 
-        private void PrivateDeserializeSipuri(string sipUri)
+        public static SipUri Parse(string s)
         {
             // sip:80362@algocloud.net
-            string[] splitted = sipUri.Split(new char[] {':', '@'});
+            string[] splitted = s.Split(new char[] { ':', '@' });
 
-            Scheme = splitted[0];
-            User = splitted[1];
-            Host = splitted[2];
+            string scheme = splitted[0];
+            string user = splitted[1];
+            string host = splitted[2];
 
             if (splitted.Length > 3)
-                Port = int.Parse(splitted[3]);
+                // with port
+                return new SipUri(host, user, scheme, int.Parse(splitted[3]));
+
+            return new SipUri(host, user, scheme);
         }
     }
 }

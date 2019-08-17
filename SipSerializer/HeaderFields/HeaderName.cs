@@ -1,9 +1,9 @@
 namespace Javor.SipSerializer.HeaderFields
 {
-    public static class HeaderFieldsNames
+    public static class HeaderName
     {
         public const string Contact = "CONTACT";
-        public const string ContactCompactForm = "m";
+        public const string ContactCompactForm = "M";
 
         public const string From = "FROM";
         

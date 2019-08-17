@@ -1,5 +1,6 @@
 using Javor.SipSerializer.HeaderFields;
 using System;
+using System.Linq;
 
 namespace Javor.SipSerializer
 {
@@ -42,11 +43,11 @@ namespace Javor.SipSerializer
         }
 
         // Standard headers
-        public string getFromHeaderValue() => _sipMessage.GetHeaderValue(HeaderFieldsNames.From);
-        public string getToHeaderValue() => _sipMessage.GetHeaderValue(HeaderFieldsNames.To);
-        public string getCallIdHeaderValue() => _sipMessage.GetHeaderValue(HeaderFieldsNames.CallId);
-        public string getViaHeaderValue() => _sipMessage.GetHeaderValue(HeaderFieldsNames.Via);
-        public string getContentLengthHeaderValue() => _sipMessage.GetHeaderValue(HeaderFieldsNames.ContentLength);
+        public string getFromHeaderValue() => _sipMessage.GetHeaderValue(HeaderName.From).First();
+        public string getToHeaderValue() => _sipMessage.GetHeaderValue(HeaderName.To).First();
+        public string getCallIdHeaderValue() => _sipMessage.GetHeaderValue(HeaderName.CallId).First();
+        public string getViaHeaderValue() => _sipMessage.GetHeaderValue(HeaderName.Via).First();
+        public string getContentLengthHeaderValue() => _sipMessage.GetHeaderValue(HeaderName.ContentLength).First();
     }
 
 }

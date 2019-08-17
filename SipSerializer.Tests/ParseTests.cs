@@ -4,6 +4,8 @@ using Javor.SipSerializer.Exceptions;
 using System.Diagnostics;
 using Javor.SipSerializer.HeaderFields;
 using Xunit;
+using System;
+using Javor.SipSerializer.Schemes;
 
 namespace Javor.SipSerializer.Tests
 {
@@ -23,6 +25,8 @@ namespace Javor.SipSerializer.Tests
                             + "Supported: 100rel, histinfo, join, replaces, timer\r\n"
                             + "Max-Forwards: 66\r\n"
                             + "Via: SIP / 2.0 / UDP 91.241.11.242:5060; branch = z9hG4bK - s1632 - 001300246567 - 1--s1632 -\r\n"
+                            + "Via: SIP / 2.0 / TCP 10.10.11.215:15060; rport = 53669; ibmsid = local.1476854311683_977646_977657; branch = z9hG4bK663015852070684\r\n"
+                            + "Via: SIP / 2.0 / TCP 10.10.11.215:15060; rport; ibmsid = local.1476854311683_977645_977656; branch = z9hG4bK767685979626846\r\n"
                             + "Accept-Language: en\r\n"
                             + "Alert-Info: < cid:internal @algocloud.net>;avaya-cm-alert-type=internal\r\n"
                             + "P-Asserted-Identity: \"Test JPR\" <sip:+420225006110@algocloud.net>\r\n"
@@ -36,17 +40,16 @@ namespace Javor.SipSerializer.Tests
                             + "P-Charging-Vector: icid-value=\"AAS:50-8da8ee801e7114ab058da0c34b0\"\r\n"
                             + "Content-Length: 258\r\n";
 
-            RawSipMessage roSipMessage = new RawSipMessage(sipTest);
+            SipMessage roSipMessage = new SipMessage(sipTest);
 
             // *** ACT ***
-            string resultFrom = roSipMessage.GetHeaderValue("FROM");
-            string resultVia = roSipMessage.GetHeaderValue("Via");
-            string resultChargingVector = roSipMessage.GetHeaderValue("P-Charging-Vector");
-            string resultContentLength = roSipMessage.GetHeaderValue("Content-Length");
+            string resultFrom = roSipMessage.GetHeaderValue("FROM")[0];
+            string[] resultVia = roSipMessage.GetHeaderValue("Via");
+            string resultChargingVector = roSipMessage.GetHeaderValue("P-Charging-Vector")[0];
+            string resultContentLength = roSipMessage.GetHeaderValue("Content-Length")[0];
 
             // *** ACT ***
             Assert.Equal(" \"Test JPR\" < sip:+420225006110@algocloud.net >; tag = 80eea88d4a11e71dda58b0b03400", resultFrom);
-            Assert.Equal(" SIP / 2.0 / UDP 91.241.11.242:5060; branch = z9hG4bK - s1632 - 001300246567 - 1--s1632 -", resultVia);
             Assert.Equal(" icid-value=\"AAS:50-8da8ee801e7114ab058da0c34b0\"", resultChargingVector);
             Assert.Equal(" 258", resultContentLength);
         }
@@ -93,50 +96,85 @@ namespace Javor.SipSerializer.Tests
 
         [Theory]
         [ClassData(typeof(SipMessageTypeTestData))]
-        public void Get_Raw_Sip_Message_Type_Success(string sipMessage, SipMessage.SipMessageType messageTypeExpected)
+        public void Get_Raw_Sip_Message_Type_Success(string sipMessage, SipMessageType messageTypeExpected)
         {
             // *** ARRANGE ***
-            RawSipMessage rawMessage = new RawSipMessage(sipMessage);
+            SipMessage rawMessage = new SipMessage(sipMessage);
 
             // *** ACT ***
-            SipMessage.SipMessageType messageTypeResult = rawMessage.GetMessageType();
+            SipMessageType messageTypeResult = rawMessage.GetMessageType();
 
             // *** ASSERT ***
             Assert.Equal(messageTypeExpected, messageTypeResult);
         }
 
         [Theory]
-        [MemberData(nameof(TestCases.TestData_SipResponses), MemberType = typeof(TestCases))]
-        public void Deserialize_Sip_Response_Success(string sipResponse)
+        [InlineData("\"Test JPR\" <sip:+420225006110@algocloud.net>;tag=80eea88d4a11e71dda58b0b03400", "Test JPR", "sip:+420225006110@algocloud.net", "80eea88d4a11e71dda58b0b03400")]
+        [InlineData("\"100, 100\" <sip:+420225006100@algocloud.net>;tag=808849de3db6e61a53657e99dc300", "100, 100", "sip:+420225006100@algocloud.net", "808849de3db6e61a53657e99dc300")]
+        public void Create_Sip_Identification_Success(string identification, string expectedName, string expectedUri, string expectedTag)
         {
-            // *** ARRANGE ***
-
             // *** ACT ***
-            var sw = new Stopwatch();
+            Identification id = Identification.Parse(identification);
 
-            // *** ACT ***
-            sw.Start();
-            SipResponse result = SipResponse.CreateSipResponse(sipResponse);
-            sw.Stop();
-
-            var test = sw.ElapsedMilliseconds;
+            // *** ASSERT ***
+            Assert.Equal(expectedName, id.DisplayName);
+            Assert.Equal(expectedUri, id.Uri.ToString());
+            Assert.Equal(expectedTag, id.Tag);
         }
 
-        [Fact]
-        public void Serialize_Sip_Response_Success()
+        [Theory]
+        [InlineData("1 INVITE", 1, "INVITE")]
+        [InlineData("5 BYE", 5, "BYE")]
+        public void Create_Sip_Cseq_Success(string cseq, int expectedSqNumber, string expectedMethod)
         {
-            // *** ARRANGE ***
-            StatusLine sl = new StatusLine(StatusCode.Ok);
-            SipResponse sr = new SipResponse(sl);
-            sr.AddHeader(@"From: ""100, 100"" <sip:+420225006100@algocloud.net>;tag=808849de3db6e61a53657e99dc300");
-            sr.AddHeader("Call-ID: 2bbb9f20629f720f74adca5da4ad4052");
-            sr.AddHeader("CSeq: 1 INVITE");
-            sr.AddHeader("Via: SIP/2.0/UDP 91.241.11.242:5060;branch=z9hG4bK-s1632-001810362697-1--s1632-");
-            sr.AddHeader("Via: SIP/2.0/TCP 192.168.26.91;branch=z9hG4bK808849de3db6e61a73657e99dc300");
-            sr.AddHeader("To: <sip:80362@algocloud.net>;tag=808849de3db6e61d4225811465a00");
+            // *** ACT ***
+            CSeq cs = CSeq.Parse(cseq);
+
+            // *** ASSERT ***
+            Assert.Equal(expectedSqNumber, cs.SequenceNumber);
+            Assert.Equal(expectedMethod, cs.Method);
+        }
+
+        [Theory]
+        [InlineData("1INVITE")]
+        [InlineData("")]
+        public void Create_Sip_Cseq_Unsuccess(string cseq)
+        {
+            // *** ACT ***
+            Action act = () => CSeq.Parse(cseq);
 
             // *** ACT ***
-            string result = sr.ToString();
+            Assert.Throws<SipParsingException>(act);
+        }
+
+        [Theory]
+        [InlineData("sip:+420225006110@algocloud.net", "sip", "+420225006110", "algocloud.net", 5060)]
+        [InlineData("sips:80362@algocloud.net:6666", "sips", "80362", "algocloud.net", 6666)]
+        public void Create_Sip_SipUri_Success(string sipUri, string expectedScheme, string expectedUser, string expectedHost, int expectedPort)
+        {
+            // *** ACT ***
+            SipUri su = SipUri.Parse(sipUri);
+
+            // *** ASSERT ***
+            Assert.Equal(expectedScheme, su.Scheme);
+            Assert.Equal(expectedHost, su.Host);
+            Assert.Equal(expectedPort, su.Port);
+            Assert.Equal(expectedUser, su.User);
+        }
+
+        [Theory]
+        [InlineData("SIP/2.0/TCP 192.168.26.91;branch=z9hG4bK808849de3db6e61a73657e99dc300")]
+        [InlineData("SIP/2.0/UDP 91.241.11.242:5060;branch=z9hG4bK-s1632-001810362697-1--s1632-")]
+        [InlineData("SIP/2.0/TCP 10.10.11.216;branch=z9hG4bK663015852070684-AP;ft=16")]
+        [InlineData("SIP/2.0/TCP 10.10.11.216;branch=z9hG4bK808849de3db6e61a73657e99dc300-AP;ft=21;received=10.10.11.216;rport=60664")]
+        public void Create_Sip_Via_Success(string via)
+        {
+            // *** ACT ***
+            Via v = Via.Parse(via);
+            string vs = v.ToString();
+
+            // *** ASSERT ***
+            Assert.Equal(via, vs);
         }
     }
 }

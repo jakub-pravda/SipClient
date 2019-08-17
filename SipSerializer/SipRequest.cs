@@ -1,11 +1,5 @@
-using Javor.SipSerializer.Attributes;
-using Javor.SipSerializer.Exceptions;
 using Javor.SipSerializer.HeaderFields;
-using Javor.SipSerializer.Helpers;
 using Javor.SipSerializer.Schemes;
-using System;
-using System.Collections.Generic;
-using System.Reflection;
 using System.Text;
 
 namespace Javor.SipSerializer
@@ -47,7 +41,7 @@ namespace Javor.SipSerializer
         public SipRequest(string requestType, string uri, int cSeq = 0)
             : this()
         {
-            RequestLine = new RequestLine(requestType, new SipUri(uri), Constants.SipVersion);
+            RequestLine = new RequestLine(requestType, SipUri.Parse(uri), Constants.SipVersion);
             Headers.CSeq = new CSeq(cSeq, RequestLine.Method);
         }
 
