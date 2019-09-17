@@ -1,15 +1,36 @@
 using System;
 
-/// <summary>
-///     Sip header
-/// </summary>
-/// <typeparam name="T">Sip header type</typeparam>
-public class SipHeader<T>
+
+public interface ISipHeader : ISipHeader<string>
+{
+}
+
+public interface ISipHeader<T>
+{
+    string Name { get; }
+    T Value { get; }
+}
+
+public class SipHeader : ISipHeader
 {
     /// <summary>
     ///     Header name
     /// </summary>
-    public string Name { get; private set; }
+    public string Name { get; private set; }   
+
+    public string Value { get; private set; }
+}
+
+/// <summary>
+///     Sip header
+/// </summary>
+/// <typeparam name="T">Sip header type</typeparam>
+public class SipHeader<T> : ISipHeader<T>
+{
+    /// <summary>
+    ///     Header name
+    /// </summary>
+    public string Name { get; private set; } 
 
     /// <summary>
     ///     Header value
@@ -31,9 +52,13 @@ public class SipHeader<T>
         return $"{Name}={Value.ToString()};";
     }
 
-    public static SipHeader<T> CreateHeader(Func<T> translator)
+    public static SipHeader<T> CreateHeader(ISipHeader sipHeader, Func<T> translator)
     {
-        T value = translator();
-        return new SipHeader<T>("", value);
-    } 
+        return CreateHeader(sipHeader.Name, translator);
+    }
+
+    public static SipHeader<T> CreateHeader(string sipHeaderName, Func<T> translator)
+    {
+        return new SipHeader<T>(sipHeaderName, translator());
+    }
 }

@@ -31,9 +31,18 @@ namespace Javor.SipSerializer
         /// </summary>
         /// <param name="headerName">Header name</param>
         /// <returns>Return header value. Only first value is returned when there are multiple headers with the same name</returns>
-        public string[] GetHeaderValue(string headerName)
+        public SipHeader GetHeaderValue(string headerName)
         {
-            return FindHeaderValue(Raw.AsSpan(), headerName);
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        ///     Get all available sip headers
+        /// </summary>
+        /// <returns>Returns all sip headers</returns>
+        public IEnumerable<SipHeader> GetSipHeaders()
+        {
+            throw new NotImplementedException();
         }
 
         /// <summary>
