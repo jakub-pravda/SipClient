@@ -35,7 +35,7 @@ namespace SipClient
             if (account == null) throw new ArgumentNullException("Invalid account.");
 
             Account = account;
-            TransactionLayer = new TransactionAgent(Account.RegistrarUri);
+            TransactionLayer = new OldTransactionAgent(Account.RegistrarUri);
         }
 
         public DefaultSipClient(SipClientAccount account, IEnumerable<string> allowedMethods)

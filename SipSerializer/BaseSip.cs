@@ -1,6 +1,12 @@
+using Javor.SipSerializer.Attributes;
 using Javor.SipSerializer.Bodies;
+using Javor.SipSerializer.Extensions;
 using Javor.SipSerializer.HeaderFields;
+using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using System.Text;
 
 namespace Javor.SipSerializer
@@ -12,22 +18,7 @@ namespace Javor.SipSerializer
     /// </summary>
     public abstract class BaseSip
     {
-        /// <summary>
-        ///     Sip message unique id.
-        /// </summary>
-        public string Id
-        {
-            get
-            {
-                return Headers.CallId;
-            }
-        }
-
-        /// <summary>
-        ///     Sip message headers.
-        /// </summary>
-        public StandardHeaders Headers { get; set; }
-            = new StandardHeaders();
+        private ICollection<SipHeader<object>> _headers;
 
         /// <summary>
         ///     Sip message bodies.
@@ -47,19 +38,31 @@ namespace Javor.SipSerializer
         {
             get
             {
-                return CheckValidity();
+                throw new NotImplementedException();
             }
         }
 
-        private SipMessageValidityCode CheckValidity()
+        /// <summary>
+        ///     Add sip header
+        /// </summary>
+        /// <param name="name">Header name</param>
+        /// <param name="value">Header value</param>
+        public void AddHeader(string name, object value)
         {
-            if (Headers.ContentLength > 0)
-            {
-                // TODO check content length validity
-                // check if sip message contains whole content
-            }
+            _headers.Add(new SipHeader<object>(name, value));
+        }
 
-            return SipMessageValidityCode.Valid;
+        public object GetHeaderOrDefault(string headerName)
+        {
+            return _headers.FirstOrDefault(h => h.Name == headerName).Value;
+        }
+
+        public object[] GetAllHeadersOrDefault(string headerName)
+        {
+            return _headers
+                .Where(h => h.Name == headerName)
+                .Select(h => h.Value)
+                .ToArray();
         }
 
         /// <summary>
@@ -69,7 +72,13 @@ namespace Javor.SipSerializer
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder();
-            sb.Append(Headers.ToString());
+
+            // headers to string
+            foreach (SipHeader<object> item in _headers)
+            {
+                sb.Append(item.ToString());
+            }
+
             sb.Append(ABNF.CRLF);
 
             return sb.ToString();

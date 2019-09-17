@@ -6,6 +6,7 @@ using Javor.SipSerializer.HeaderFields;
 using Xunit;
 using System;
 using Javor.SipSerializer.Schemes;
+using SipSerializer.Parsers;
 
 namespace Javor.SipSerializer.Tests
 {
@@ -170,11 +171,17 @@ namespace Javor.SipSerializer.Tests
         public void Create_Sip_Via_Success(string via)
         {
             // *** ACT ***
-            Via v = Via.Parse(via);
+            Via v = new ViaParser().Parse(via);
             string vs = v.ToString();
 
             // *** ASSERT ***
             Assert.Equal(via, vs);
+        }
+
+        [Fact]
+        public void Test()
+        {
+            SipHeader<CSeq> test = SipHeader<CSeq>.CreateHeader(() => CSeq.Parse("1 INVITE"));
         }
     }
 }

@@ -1,3 +1,4 @@
+using Javor.SipSerializer.Extensions;
 using Javor.SipSerializer.HeaderFields;
 using Javor.SipSerializer.Schemes;
 using System.Text;
@@ -29,7 +30,7 @@ namespace Javor.SipSerializer
             : this()
         {
             RequestLine = new RequestLine(requestType, uri, Constants.SipVersion);
-            Headers.CSeq = new CSeq(cSeq, RequestLine.Method);
+            this.AddCseqHeader(new CSeq(cSeq, RequestLine.Method));
         }
 
         /// <summary>
@@ -42,7 +43,7 @@ namespace Javor.SipSerializer
             : this()
         {
             RequestLine = new RequestLine(requestType, SipUri.Parse(uri), Constants.SipVersion);
-            Headers.CSeq = new CSeq(cSeq, RequestLine.Method);
+            this.AddCseqHeader(new CSeq(cSeq, RequestLine.Method));
         }
 
         /// <summary>
@@ -54,7 +55,7 @@ namespace Javor.SipSerializer
             : this()
         {
             RequestLine = requestLine;
-            Headers.CSeq = new CSeq(cSeq, RequestLine.Method);
+            this.AddCseqHeader(new CSeq(cSeq, RequestLine.Method));
         }
 
         /// <summary>

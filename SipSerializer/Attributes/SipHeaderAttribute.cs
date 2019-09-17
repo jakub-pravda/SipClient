@@ -5,13 +5,13 @@ namespace Javor.SipSerializer.Attributes
     /// <summary>
     ///     Header name attribute.
     /// </summary>
-    public class HeaderNameAttribute : Attribute
+    public class SipHeaderAttribute : Attribute
     {
         /// <summary>
         ///     Initialize new header name attribute.
         /// </summary>
         /// <param name="longName">Header full name.</param>
-        public HeaderNameAttribute(string longName)
+        public SipHeaderAttribute(string longName)
         {
             if (string.IsNullOrEmpty(longName)) throw new ArgumentNullException("Header name cannot be null.");
 
@@ -23,7 +23,7 @@ namespace Javor.SipSerializer.Attributes
         /// </summary>
         /// <param name="longName">Header full name.</param>
         /// <param name="compactFormName">Header compact name.</param>
-        public HeaderNameAttribute(string longName, string compactFormName)
+        public SipHeaderAttribute(string longName, string compactFormName)
             : this(longName)
         {
             if (string.IsNullOrEmpty(compactFormName)) throw new ArgumentNullException("Header compact form name cannot be null.");

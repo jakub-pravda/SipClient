@@ -26,7 +26,7 @@ namespace SipClient.Models
         /// <summary>
         ///     Initial transaction request.
         /// </summary>
-        public SipRequest InitialRequest { get; }
+        public LazySipMessage Request { get; }
 
         /// <summary>
         ///     Final response message (non 1xx message).
@@ -34,17 +34,16 @@ namespace SipClient.Models
         public SipResponse FinalResponse { get; private set; }
 
         /// <summary>
-        ///     Initialize new transaction.
+        ///     Initial new transaction
         /// </summary>
-        /// <param name="transactionId">Transaction id.</param>
-        public Transaction(SipRequest initialRequest)
+        /// <param name="sipRequest">Sip request message</param>
+        public Transaction(LazySipMessage sipRequest)
         {
-            if (initialRequest == null) throw new ArgumentNullException("Invalid initial SIP request message.");
+            if (sipRequest == null) throw new ArgumentNullException("Sip request cann't be null");
 
-            InitialRequest = initialRequest;
+            Request = sipRequest;
 
-            int viaCount = initialRequest.Headers.Via.Count;
-            TransactionId = initialRequest.Headers.Via.Last().Branch;
+            TransactionId = initialRequest.Headers.Via.Last().Branch; // need last branch id!
             Status = TransactionStatus.INIT;
         }
 

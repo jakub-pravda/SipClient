@@ -30,13 +30,20 @@ namespace SipClient.Instances
         /// <returns></returns>
         Task<bool> SendSipRequestAsync(SipRequest request, bool waitForResponse = false);
 
+        Task<bool> ProcessSipMessageAsync(string sipMessage);
+        
         /// <summary>
-        ///     Start with listening on the designated ip address:port
+        ///     Process s new sip request.
         /// </summary>
-        /// <param name="ipAddress"></param>
-        /// <param name="port"></param>
+        /// <param name="sipMessage">Incoming sip message</param>
+        /// <returns>Sip response for incoming sip request</returns>
+        Task<SipResponse> ProcessSipRequestAsync(string sipMessage);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sipMessage"></param>
         /// <returns></returns>
-        void StartListening(string ipAddress, int port);
-        void StopListening();
+        Task ProcessSipResponseAsync(string sipMessage);
     }
 }
