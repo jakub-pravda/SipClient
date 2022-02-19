@@ -44,14 +44,7 @@ namespace Javor.SdpSerializer.Specifications
         /// <inheritdoc />
         public override string Encode()
         {
-            StringBuilder sb = new StringBuilder();
-            
-            sb.Append(SdpType);
-            sb.Append(StartTime.ToString());
-            sb.Append(":");
-            sb.Append(StopTime.ToString());
-
-            return sb.ToString();
+            return $"{SdpType}{StartTime.ToString()}:{StopTime.ToString()}";
         }
     }
 }
