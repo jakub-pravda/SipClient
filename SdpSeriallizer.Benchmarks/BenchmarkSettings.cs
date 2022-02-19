@@ -6,6 +6,7 @@ using Javor.SdpSerializer.Specifications;
 
 namespace SdpSeriallizer.Benchmarks
 {
+    [MemoryDiagnoser]
     public class BenchmarkSettings
     {
         public SessionDescription TestData { get; }

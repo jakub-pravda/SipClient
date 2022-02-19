@@ -64,29 +64,7 @@ namespace Javor.SdpSerializer.Specifications
         /// <inheritdoc />
         public override string Encode()
         {
-            string space = " ";
-            StringBuilder sb = new StringBuilder();
-            
-            sb.Append(SdpType);
-            
-            sb.Append(Username);
-            sb.Append(space);
-            
-            sb.Append(SessionId);
-            sb.Append(space); 
-            
-            sb.Append(SessionVersion);
-            sb.Append(space);
-            
-            sb.Append(NetType);
-            sb.Append(space);
-            
-            sb.Append(AddressType);
-            sb.Append(space);
-            
-            sb.Append(UnicastAddress);
-
-            return sb.ToString();
+            return $"{SdpType}{Username} {SessionId} {SessionVersion} {NetType} {AddressType} {UnicastAddress}";
         }
     }
 }

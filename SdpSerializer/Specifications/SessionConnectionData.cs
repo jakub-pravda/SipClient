@@ -51,22 +51,7 @@ namespace Javor.SdpSerializer.Specifications
         /// <inheritdoc />
         public override string Encode() 
         {
-            StringBuilder sb = new StringBuilder();
-
-            sb.Append(SdpType);
-            
-            // append nettype
-            sb.Append(NetType);
-            sb.Append(" ");
-
-            // append addrtype
-            sb.Append(AddressType);
-            sb.Append(" ");
-
-            // append connection address
-            sb.Append(ConnectionAddress);
-
-            return sb.ToString();
+            return $"{SdpType}{NetType} {AddressType} {ConnectionAddress}";
         }
     }
 }
